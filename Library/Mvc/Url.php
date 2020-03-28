@@ -53,7 +53,7 @@ class Url extends AbstractUrl{
 	}
 	
 	public function isHome() {
-		return !$this->path || $this->path === '/';
+		return !$this->path || $this->path === $this->homePath;
 	}
 
 }
