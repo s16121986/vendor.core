@@ -19,7 +19,7 @@ class Tree extends Table{
 	private function tree($parentId, $level = 0, &$index = 0) {
 		$html = '';
 		foreach ($this->grid->getData()->get() as $row) {
-			if ($row[$this->parentIndex] != $parentId) {
+			if ($row->{$this->parentIndex} != $parentId) {
 				continue;
 			}
 			$html .= '<tr' . ($index % 2 ? ' class="alt"' : '') . '>';
@@ -34,7 +34,7 @@ class Tree extends Table{
 			}
 			$html .= '</tr>';
 			$index++;
-			$html .= $this->tree($row['id'], $level + 1, $index);
+			$html .= $this->tree($row->id, $level + 1, $index);
 		}
 		return $html;
 	}
