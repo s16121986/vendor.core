@@ -51,12 +51,14 @@ class Select extends Xhtml{
 			$item->value = self::getItemParam($text, $this->valueIndex, self::$_autoValueKeys);
 			$item->text = self::getItemParam($text, $this->textIndex, self::$_autoTextKeys);
 			$item->attr = self::getItemParam($text, 'attr');
+			$item->parent_id = self::getItemParam($text, 'parent_id');
 			if ($this->groupIndex)
 				$item->{$this->groupIndex} = self::getItemParam($text, $this->groupIndex);
 		} else {
 			$item->value = $value;
 			$item->text = $text;
 			$item->attr = null;
+			$item->parent_id = null;
 		}
 		
 		$this->_items[] = $item;
