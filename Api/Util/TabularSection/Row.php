@@ -29,7 +29,10 @@ class Row{
 		
 		foreach ($this->tabularSection->getAttributes() as $attribute) {
 			
-			$setFlag = array_key_exists($attribute->name, $data) && $attribute->setValue($data[$attribute->name]);
+			if (array_key_exists($attribute->name, $data))
+				$setFlag = $attribute->setValue($data[$attribute->name]);
+			else
+				$setFlag = $attribute->setValue(null);
 			
 			if ($setFlag) {
 				$rowData[$attribute->name] = $attribute->getValue();
