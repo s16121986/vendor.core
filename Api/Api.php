@@ -234,6 +234,8 @@ abstract class Api extends Api\Util\BaseApi{
 						throw new AttributeException(Exception::ATTRIBUTE_REQUIRED, $k);
 					elseif ($attribute instanceof AttributeFile)
 						continue;
+					else if ($attribute->notnull && null === $attribute->default)
+						continue;
 					
 					$this->_set($k, $attribute->default);
 				}
