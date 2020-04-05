@@ -19,7 +19,7 @@ class TabularSection extends BaseApi{
 	
 	public function __construct(Api $parent, $table, $attribute = null, $attributeType = null, $attributeQualifiers = []) {
 		$this->parent = $parent;
-		$this->parentIndex = $this->parent->getForeignKey();
+		$this->parentIndex = $this->parent->foreignKey;
 		$this->table = $table;
 		
 		$this->data = new Data($this);
