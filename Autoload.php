@@ -23,7 +23,7 @@ abstract class Autoload{
 				$cls = $class;
 				if ($path[2] !== null)
 					$cls = str_replace($path[1], $path[2], $cls);
-				return Autoload::include($cls, $path[0], true);
+				return Autoload::include($cls, $path[0], false);
 			}
 			return Autoload::include($class, $defaultPath, false);
 		});

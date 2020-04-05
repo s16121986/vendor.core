@@ -94,6 +94,9 @@ class Application{
 			}
 			
 			$this->trigger('dispatch');
+			
+			$controller->onDispatch();
+			
 			$return = $controller->{$actionName . 'Action'}();
 			
 		} catch (BaseException | ErrorException | Error $e) {
