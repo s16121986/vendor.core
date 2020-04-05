@@ -85,7 +85,7 @@ abstract class Controller{
 		return $this->view->render($path, $attributes);
 	}
 	
-	protected function onDispatch() {
+	public function onDispatch() {
 		
 	}
 	
