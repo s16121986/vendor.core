@@ -72,6 +72,7 @@ abstract class Api extends Api\Util\BaseApi{
 		switch($name) {
 			case 'id':
 			case 'table':
+			case 'foreignKey':
 				return $this->$name;
 		}
 		switch (true) {
@@ -128,10 +129,6 @@ abstract class Api extends Api\Util\BaseApi{
 
 	public function getId() {
 		return $this->id;
-	}
-
-	public function getForeignKey() {
-		return $this->foreignKey;
 	}
 
 	public function getData() {
