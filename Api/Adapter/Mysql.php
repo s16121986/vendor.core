@@ -7,6 +7,7 @@ use Api\Exception;
 use Api\Util\Translation;
 use Api\Attribute\AttributeDate;
 use Api\Attribute\AttributeNumber;
+use Api\File as ApiFile;
 
 class Mysql extends AbstractAdapter{
 	
@@ -229,9 +230,11 @@ class Mysql extends AbstractAdapter{
 		$primary = [];
 				
 		foreach ($this->_api->getAttributes() as $attribute) {
-			if ($attribute->name === 'id')
+			if ($attribute->name === 'id') {
 				unset($data[$attribute->name]);
-			else if ($attribute->locale) {
+				$primary['id'] = $this->_api->id;
+				continue;
+			} else if ($attribute->locale) {
 				if (!$attribute->changed)
 					continue;
 				$localeData[$attribute->name] = $attribute->getValue();
@@ -239,6 +242,8 @@ class Mysql extends AbstractAdapter{
 			}
 			if ($attribute->primary)
 				$primary[$attribute->name] = $attribute->getValue();
+				if ($primary[$attribute->name] instanceof ApiFile)
+					$primary[$attribute->name] = $primary[$attribute->name]->id;
 		}
 		
 		$isNew = $this->_api->isNew();

@@ -5,6 +5,7 @@ use Api\Attribute\Exception as AttributeException;
 use Api\Util\DeleteManager;
 use Api\Attribute\AttributeFile;
 use Api\Attribute\AttributeNumber;
+use Api\Attribute\AttributePredefined;
 use Stdlib\DateTime;
 
 abstract class Api extends Api\Util\BaseApi{
@@ -226,6 +227,8 @@ abstract class Api extends Api\Util\BaseApi{
 
 				} elseif ($attribute instanceof AttributeFile)
 					continue;
+				elseif ($attribute instanceof AttributePredefined)
+					$this->_set($k, $attribute->value);
 				else if ($attribute->isEmpty()) {
 					if ($attribute->required)
 						throw new AttributeException(Exception::ATTRIBUTE_REQUIRED, $k);
