@@ -278,26 +278,6 @@ abstract class Api extends Api\Util\BaseApi{
 	public function delete($data = null) {
 		if ($this->isEmpty())
 			throw new Exception(Exception::ID_EMPTY);
-		
-		if (DeleteManager::init($this)) {
-			try {
-				$e = null;
-				$res = DeleteManager::delete();
-				//$res = $this->delete();
-			} catch (\Exception $e) {
-				$res = false;
-			}
-			if (false === $res) {
-				if (!$e)
-					$e = new Exception(Exception::DELETE_ABORTED);
-				
-				DeleteManager::rollback();
-				throw $e;
-			} else {
-				DeleteManager::commit();
-			}
-			return $res;
-		}
 
 		/*if (false === EventManager::trigger('beforeDelete', $this))
 			return false;*/
