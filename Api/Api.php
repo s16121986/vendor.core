@@ -292,11 +292,11 @@ abstract class Api extends Api\Util\BaseApi{
 		if (!$this->getAdapter()->delete())
 			throw new Exception(Exception::DELETE_ABORTED);
 			
-		foreach ($this->getAttributes() as $attribute) {
+		/*foreach ($this->getAttributes() as $attribute) {
 			if  ($attribute instanceof AttributeFile) {
 				DeleteManager::pushFileAttribute($attribute);
 			}
-		}
+		}*/
 		
 		$this->afterDelete();
 		//EventManager::trigger('delete', $this);
