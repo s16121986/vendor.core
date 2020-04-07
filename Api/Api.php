@@ -32,8 +32,11 @@ abstract class Api extends Api\Util\BaseApi{
 
 	public function __construct() {
 		//$this->initReferences();
-		$this->attributes['id'] = new AttributeNumber('id', ['primary' => true]);
 		$this->init();
+	}
+	
+	protected function init() {
+		$this->attributes['id'] = new AttributeNumber('id', ['primary' => true]);
 	}
 
 	public function __set($name, $value) {
