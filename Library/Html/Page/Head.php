@@ -141,6 +141,14 @@ class Head{
 		return $url;
 	}
 	
+	public function getStyles() {
+		return $this->styles;
+	}
+	
+	public function getScrits() {
+		return $this->scripts;
+	}
+	
 	public function getHtml($format = null) {
 		$html = '';
 		switch ($format) {
