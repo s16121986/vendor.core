@@ -240,10 +240,11 @@ class Mysql extends AbstractAdapter{
 				$localeData[$attribute->name] = $attribute->getValue();
 				unset($data[$attribute->name]);
 			}
-			if ($attribute->primary)
+			if ($attribute->primary) {
 				$primary[$attribute->name] = $attribute->getValue();
 				if ($primary[$attribute->name] instanceof ApiFile)
 					$primary[$attribute->name] = $primary[$attribute->name]->id;
+			}
 		}
 		
 		$isNew = $this->_api->isNew();
