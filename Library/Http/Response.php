@@ -110,6 +110,10 @@ class Response {
 		return $this;
 	}
 	
+	public function getContent() {
+		return $this->content;
+	}
+	
 	public function setEncoding($encoding) {
 		$this->encoding = $encoding;
 		$this->setHeader('Content-Encoding', $encoding);
