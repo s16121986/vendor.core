@@ -292,8 +292,11 @@ class Mysql extends AbstractAdapter{
 			foreach ($this->_api->getAttributes() as $attribute) {
 				if ($attribute->name === 'id')
 					$where['id'] = $this->_api->id;
-				else if ($attribute->primary)
+				else if ($attribute->primary) {
 					$where[$attribute->name] = $attribute->getValue();
+					if ($where[$attribute->name] instanceof ApiFile)
+						$where[$attribute->name] = $where[$attribute->name]->id;
+				}
 			}
 			if (empty($where))
 				throw new Exception('Primary key empty');
