@@ -34,7 +34,7 @@ class File extends File\AbstractFile{
 	}
 
 	public function __toString() {
-		return '';
+		return $this->basename;
 	}
 
 }
