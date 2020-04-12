@@ -12,7 +12,6 @@ abstract class AbstractAttribute{
 		'notnull' => true,
 		'default' => null,
 		'locale' => false,
-		'localeDefault' => false,
 
 		'dbfield' => true,
 

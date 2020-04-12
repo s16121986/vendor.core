@@ -157,9 +157,7 @@ abstract class AbstractAdapter{
 		if (isset($options['fields']) && is_array($options['fields'])) {
 			$fileds = $options['fields'];
 		}*/
-		$language = Translation::getLanguage();
-		$languageDefault = Translation::getDefault();
-		
+		$language = Translation::getLanguage();		
 		foreach ($this->_api->getAttributes() as $attribute) {
 			if (!$attribute->locale)
 				continue;
@@ -167,12 +165,6 @@ abstract class AbstractAdapter{
 			$translationTable = Translation::getTable($this->_api);
 			$this->joinLeft($translationTable, $translationTable . '.translatable_id=`' . $table . '`.id'
 					. ' AND `' . $translationTable . '`.`language`="' . $language->code . '"', null);
-			if ($attribute->localeDefault && !$language->default) {
-				$this->columns('(SELECT ' . $attribute->name
-						. ' FROM ' . $translationTable 
-						. ' WHERE translatable_id=`' . $table . '`.id'
-						. ' AND language="' . $languageDefault->code . '") as ' . $attribute->name . '_default');
-			}
 			break;
 		}
 		foreach ($settings->joins as $join) {
