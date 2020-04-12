@@ -353,6 +353,11 @@ class Mysql extends AbstractAdapter{
 	public function query($query) {
 		return \Db::query($query);
 	}
+	
+	public function columns($columns) {
+		$this->_query->columns($columns);
+		return $this;
+	}
 
 	protected function where($where, $value = null) {
 		$this->_query->where($where, $value);
