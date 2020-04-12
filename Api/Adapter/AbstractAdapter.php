@@ -171,7 +171,7 @@ abstract class AbstractAdapter{
 				$this->columns('(SELECT ' . $attribute->name
 						. ' FROM ' . $translationTable 
 						. ' WHERE translatable_id=`' . $table . '`.id'
-						. ' AND language="' . $languageDefault->code . '") as ' . $attribute . '_' . $languageDefault->code);
+						. ' AND language="' . $languageDefault->code . '") as ' . $attribute->name . '_' . $languageDefault->code);
 			}
 			break;
 		}
