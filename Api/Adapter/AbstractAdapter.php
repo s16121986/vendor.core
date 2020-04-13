@@ -158,15 +158,18 @@ abstract class AbstractAdapter{
 			$fileds = $options['fields'];
 		}*/
 		$language = Translation::getLanguage();		
-		foreach ($this->_api->getAttributes() as $attribute) {
-			if (!$attribute->locale)
-				continue;
-			$table = $this->_api->table;
-			$translationTable = Translation::getTable($this->_api);
-			$this->joinLeft($translationTable, $translationTable . '.translatable_id=`' . $table . '`.id'
-					. ' AND `' . $translationTable . '`.`language`="' . $language->code . '"', null);
-			break;
+		if ($language) {
+			foreach ($this->_api->getAttributes() as $attribute) {
+				if (!$attribute->locale)
+					continue;
+				$table = $this->_api->table;
+				$translationTable = Translation::getTable($this->_api);
+				$this->joinLeft($translationTable, $translationTable . '.translatable_id=`' . $table . '`.id'
+						. ' AND `' . $translationTable . '`.`language`="' . $language->code . '"', null);
+				break;
+			}
 		}
+		
 		foreach ($settings->joins as $join) {
 			if ($columns) {
 				$cols = array();
