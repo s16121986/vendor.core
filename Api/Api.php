@@ -2,7 +2,8 @@
 use Api\Exception;
 use Api\Util\TabularSection;
 use Api\Attribute\Exception as AttributeException;
-use Api\Util\DeleteManager;
+use Api\Util\DeleteTransaction;
+use Api\Util\Relations;
 use Api\Attribute\AttributeFile;
 use Api\Attribute\AttributeNumber;
 use Api\Attribute\AttributePredefined;
@@ -282,6 +283,9 @@ abstract class Api extends Api\Util\BaseApi{
 	}
 
 	public function delete($data = null) {
+		if (!DeleteTransaction::initialized())
+			return DeleteTransaction::init($this, false);
+		
 		if ($this->isEmpty())
 			throw new Exception(Exception::ID_EMPTY);
 
@@ -297,17 +301,15 @@ abstract class Api extends Api\Util\BaseApi{
 		
 		if (!$this->getAdapter()->delete())
 			throw new Exception(Exception::DELETE_ABORTED);
-			
-		/*foreach ($this->getAttributes() as $attribute) {
-			if  ($attribute instanceof AttributeFile) {
-				DeleteManager::pushFileAttribute($attribute);
-			}
-		}*/
 		
 		$this->afterDelete();
 		//EventManager::trigger('delete', $this);
 		//$this->reset();
 		return true;
+	}
+	
+	public function getRelations() {
+		return new Relations($this);
 	}
 
 	protected function _set($name, $value) {

@@ -1,7 +1,9 @@
 <?php
 namespace Api;
 
-class Exception extends \Exception{
+use Exception as BaseException;
+
+class Exception extends BaseException{
 	
 	const UNKNOWN = 0;
 	const FATAL = -1;
@@ -19,57 +21,26 @@ class Exception extends \Exception{
 	const DATA_INCORRECT = 201;
 	const RECORD_EMPTY = 202;
 	const DELETE_ABORTED = 203;
-	const ID_INCORRECT = 204;
-	const ID_EMPTY = 205;
+	const DELETE_RESTRICTED = 204;
+	const ID_INCORRECT = 205;
+	const ID_EMPTY = 206;
 	const FILE_OPEN = 300;
 	const FILES_EMPTY = 301;
 	const SERVER_NOT_FOUND = 302;
 
-	protected $_error = self::UNKNOWN;
-	protected $_data = array();
-	
-	protected static function _getConstatnts() {
-		$cls = get_called_class();
-		$refl = new \ReflectionClass($cls);
-		$const = $refl->getConstants();
-		return $const;
-	}
-	
-	public static function getErrorKey($value) {
-		foreach (self::_getConstatnts() as $k => $v) {
-			if ($v == $value) {
-				return $k;
-			}
-		}
-		return null;
-	}
+	protected $data = [];
 
-	public function  __construct($error = self::UNKNOWN, $data = null, $previous = null) {
-		if (is_int($error)) {
-			$this->_error = $error;
-			$message = self::getErrorKey($error);
-		} else {
-			$message = $error;
-			$error = self::UNKNOWN;
-		}
-		if (is_array($data)) {
-			if (isset($data['message'])) {
-				$message = $data['message'];
-				unset($data['message']);
-			}
-			$this->_data = $data;
-		} elseif (null !== $data) {
-			$error = $data;
-		}
-		parent::__construct($message, null, $previous);
+	public function  __construct(string $message = "", int $code = 0, $data = NULL) {
+		$this->data = $data;			
+		parent::__construct($message, $code);
 	}
 
 	public function __get($name) {
-		return (isset($this->_data[$name]) ? $this->_data[$name] : null);
+		return (isset($this->data[$name]) ? $this->data[$name] : null);
 	}
 
 	public function getData() {
-		return $this->_data;
+		return $this->data;
 	}
 
 }
