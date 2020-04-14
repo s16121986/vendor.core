@@ -160,6 +160,18 @@ class Head{
 				foreach ($this->styles as $style)
 					$html .= $style->getHtml() . "\n";
 				return $html;
+			case 'style_ready':
+				foreach ($this->getStyles() as $style) {
+					$html .= 'let h = document.getElementsByTagName("head")[0];';
+					$html .= 'let l = document.createElement("link");'
+						. 'l.onload=ready;';
+					foreach (['rel', 'type', 'media', 'href'] as $k) {
+						$html .= 'l.' . $k . '="' . $style->$k . '";';
+					}
+					$html .= 'h.appendChild(l);';
+					break;
+				}
+				return $html;
 			case 'footer':
 				//$html .= $this->getHtml('styles');
 				$html .= $this->getHtml('scripts');
@@ -180,8 +192,8 @@ class Head{
 				$scripts .= '})(document.getElementsByTagName("head")[0]);';
 				$html .= '<script>' . $scripts . '</script>';
 				return $html;
-				
 		}
+		
 		$html .= '<head' . ($this->headAttr ? ' ' . $this->headAttr : '') . '>' . "\n";
 		$html .= '<title>' . $this->title . '</title>' . "\n";
 		
