@@ -52,23 +52,10 @@ abstract class Api extends Api\Util\BaseApi{
 		}
 		
 		if (!array_key_exists($name, $this->attributes))
-			//throw new AttributeException(Exception::ATTRIBUTE_UNDEFINED, $name);
 			return null;
 		
-		/*if (!$this->isNew()) {
-			if (!$this->attributes[$name]->update) {
-				throw new AttributeException(Exception::ATTRIBUTE_REWRITE, $name);
-				return null;
-			}
-		}*/
 		if (false === $this->attributes[$name]->setValue($value))
-			throw new AttributeException(Exception::ATTRIBUTE_INVALID, $name);
-		
-		/*if ($this->attributes[$name] instanceof AttributeFile) {
-			$this->_data[$name] = $this->attributes[$name]->getValue();
-		} else {
-			$this->_set($name, $this->attributes[$name]->getValue());
-		}*/
+			throw new AttributeException($this->attributes[$name], 'Attribute "' . $name . '" value invalid', Exception::ATTRIBUTE_INVALID);
 		
 		return true;
 	}
@@ -235,7 +222,7 @@ abstract class Api extends Api\Util\BaseApi{
 					$this->_set($k, $attribute->value);
 				else if ($attribute->isEmpty()) {
 					if ($attribute->required)
-						throw new AttributeException(Exception::ATTRIBUTE_REQUIRED, $k);
+						throw new AttributeException($attribute, 'Attribute "' . $attribute->name . '" value undefined', Exception::ATTRIBUTE_REQUIRED);
 					elseif ($attribute instanceof AttributeFile)
 						continue;
 					else if ($attribute->notnull && null === $attribute->default)
