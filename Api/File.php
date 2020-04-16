@@ -93,10 +93,10 @@ class File extends \File{
 			chmod($filename, $mode);
 		
 		if (($group = self::config('group')))
-			chgrp($filename, $group);
+			chgrp($filename, octdec($group));
 		
 		if (($user = self::config('user')))
-			chown($filename, $user);
+			chown($filename, octdec($user));
 	}
 	
 	protected static function config($name, $default = null) {
