@@ -8,9 +8,15 @@ class File extends \File{
 
 	const NESTING_LEVEL = 3;
 	const DIRECTORY_NAME_LENGTH = 2;
+	
+	private static $config;
 
 	protected $_model;
 	protected $_parts = [];
+	
+	public static function setConfig($config) {
+		self::$config = $config;
+	}
 
 	public static function getById($id) {
 		return self::getBy('id', $id);
@@ -74,11 +80,27 @@ class File extends \File{
 		$dir = FILES_PATH . DIRECTORY_SEPARATOR;
 		while (!empty($paths)) {
 			$dir = $dir . array_shift($paths) . DIRECTORY_SEPARATOR;
-			if (!is_dir($dir)) {
-				mkdir($dir);
-			}
+			if (is_dir($dir))
+				continue;
+			mkdir($dir, self::config('chmod.dir', 0770));
+			self::chmod($dir);
 		}
 		return true;
+	}
+	
+	protected static function chmod($filename) {
+		if (is_file($filename) && ($mode = self::config('chmod.file')))
+			chmod($filename, $mode);
+		
+		if (($group = self::config('group')))
+			chgrp($filename, $group);
+		
+		if (($user = self::config('user')))
+			chown($filename, $user);
+	}
+	
+	protected static function config($name, $default) {
+		return isset(self::$config[$name]) ? self::$config[$name] : $default;
 	}
 
 	protected function init() {
@@ -139,20 +161,22 @@ class File extends \File{
 		if ($this->isNew()) {
 			$this->_set('guid', self::getNewGuid());
 			$this->init();
-			if ($this->exists()) {
+			if ($this->exists())
 				$this->unlink();
-			}
+			
 			self::checkPath($this->guid);
 
-			if (false === ($fh = fopen($this->fullname, 'w+'))) {
+			if (false === ($fh = fopen($this->fullname, 'w+')))
 				throw new Exception('Cant create file');
-			}
+			
 			fwrite($fh, $this->getContents());
 			fclose($fh);
+			
+			self::chmod($this->fullname);
 
-			if ($this->_model && !$this->_model->isNew()) {
+			if ($this->_model && !$this->_model->isNew())
 				$this->_set('parent_id', $this->_model->id);
-			}
+			
 			/* if (defined('UserId') && UserId) {
 			  $this->_set('author_id', UserId);
 			  } */
@@ -166,9 +190,8 @@ class File extends \File{
 			}
 		}
 		
-		if ($this->isNew()) {
+		if ($this->isNew())
 			$data['created'] = 'CURRENT_TIMESTAMP';
-		}
 
 		$id = Db::write('files', $data, $this->id);
 		if ($id) {
@@ -177,6 +200,7 @@ class File extends \File{
 					$fh = fopen($part->fullname, 'w+');
 					fwrite($fh, $part->getContents());
 					fclose($fh);
+					self::chmod($part->fullname);
 					Db::insert('file_parts', array(
 						'file_id' => $id,
 						'name' => $part->name,
