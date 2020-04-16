@@ -82,21 +82,21 @@ class File extends \File{
 			$dir = $dir . array_shift($paths) . DIRECTORY_SEPARATOR;
 			if (is_dir($dir))
 				continue;
-			mkdir($dir, self::config('chmod.dir', 0770));
-			self::chmod($dir);
+			mkdir($dir);
+			self::chmod($dir, 'dir');
 		}
 		return true;
 	}
 	
-	protected static function chmod($filename) {
-		if (is_file($filename) && ($mode = self::config('chmod.file')))
-			chmod($filename, $mode);
+	protected static function chmod($filename, $type) {
+		if (($mode = self::config('chmod.' . $type)))
+			chmod($filename, octdec($mode));
 		
 		if (($group = self::config('group')))
-			chgrp($filename, octdec($group));
+			chgrp($filename, $group);
 		
 		if (($user = self::config('user')))
-			chown($filename, octdec($user));
+			chown($filename, $user);
 	}
 	
 	protected static function config($name, $default = null) {
@@ -172,7 +172,7 @@ class File extends \File{
 			fwrite($fh, $this->getContents());
 			fclose($fh);
 			
-			self::chmod($this->fullname);
+			self::chmod($this->fullname, 'file');
 
 			if ($this->_model && !$this->_model->isNew())
 				$this->_set('parent_id', $this->_model->id);
@@ -200,7 +200,7 @@ class File extends \File{
 					$fh = fopen($part->fullname, 'w+');
 					fwrite($fh, $part->getContents());
 					fclose($fh);
-					self::chmod($part->fullname);
+					self::chmod($part->fullname, 'file');
 					Db::insert('file_parts', array(
 						'file_id' => $id,
 						'name' => $part->name,
