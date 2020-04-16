@@ -99,7 +99,7 @@ class File extends \File{
 			chown($filename, $user);
 	}
 	
-	protected static function config($name, $default) {
+	protected static function config($name, $default = null) {
 		return isset(self::$config[$name]) ? self::$config[$name] : $default;
 	}
 
