@@ -76,7 +76,8 @@ class Http extends HttpResponse{
 			if ($this->renderExceptions()) {
 				$this->setContent($this->exception->__toString());
 			}
-			$this->setHttpCode($this->exception->getCode());
+			if (!$this->httpCode)
+				$this->setHttpCode(500);
 		} else {
 			$this->setHttpCode(200);
 		}

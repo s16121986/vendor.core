@@ -7,6 +7,7 @@ class Response {
 	protected $encoding = null;
 	protected $content = '';
 	protected $range;
+	protected $httpCode;
 	protected $headers = [];
 
 	public function setRawHeader(string $header, $replace = true, $code = null) {
@@ -36,7 +37,7 @@ class Response {
 	}
 
 	public function setHttpCode($code) {
-		http_response_code($code);
+		$this->httpCode = $code;
 		/*
 		  $HTTPCodes = [
 		  100 => 'Continue',
@@ -152,6 +153,7 @@ class Response {
 		
 		$this->setContentLength($length);
 		
+		http_response_code($this->httpCode ?: 200);
 		$this->sendHeaders();
 		echo $content;
 		return $this;
