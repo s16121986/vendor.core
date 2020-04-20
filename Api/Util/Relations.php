@@ -47,11 +47,11 @@ class Relations implements Iterator{
 	}
 	
 	public function restrict($entity, $foreignKey = null) {
-		return $this->add(Relation::ONDELETE_RESTRICT, $entity, $foreignKey);
+		return $this->add($entity, Relation::ONDELETE_RESTRICT, $foreignKey);
 	}
 	
 	public function cascade($entity, $foreignKey = null) {
-		return $this->add(Relation::ONDELETE_CASCADE, $entity, $foreignKey);
+		return $this->add($entity, Relation::ONDELETE_CASCADE, $foreignKey);
 	}
 	
 	private function add($entity, $ondelete, $foreignKey = null) {
