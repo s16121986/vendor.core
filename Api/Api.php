@@ -369,5 +369,19 @@ abstract class Api extends Api\Util\BaseApi{
 	protected function beforeDelete() {}
 
 	protected function afterDelete() {}
+	
+	public function uuid() {
+		$uuid = strtolower($this->getModelName());
+		
+		$pk = [];
+		foreach ($this->attributes as $attribute) {
+			if (!$attribute->primary)
+				continue;
+			
+			$pk[] = (string)$attribute->getValue();
+		}
+		
+		return $uuid . '_' . implode('-', $pk);
+	}
 
 }

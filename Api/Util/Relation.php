@@ -3,25 +3,27 @@ namespace Api\Util;
 
 class Relation{
 	
-	const TYPE_CASCADE = 'cascade';
-	const TYPE_RESTRICT = 'restrict';
+	const ONDELETE_CASCADE = 'cascade';
+	const ONDELETE_RESTRICT = 'restrict';
+	const ONDELETE_SETNULL = 'setnull';
+	const ONDELETE_NOACTION = 'noaction';
+	
+	//const TYPE_MODEL = 'model';
+	//const TYPE_TABLE = 'table';
 	
 	private $id;
 	private $entity;
-	private $type;
+	private $ondelete;
+	//private $type;
 	
-	public function __construct($entity, $type) {
+	public function __construct($entity, $ondelete) {
+		$this->ondelete = $ondelete;
 		$this->entity = $entity;
-		$this->type = $type;
 		$this->id = $entity->uuid();
 	}
 	
 	public function __get($name) {
 		return isset($this->$name) ? $this->$name : null;
-	}
-	
-	public function isRequired() {
-		return $this->required;
 	}
 	
 	public function __toString() {

@@ -38,31 +38,31 @@ class Relations implements Iterator{
         return isset($this->items[$this->position]);
     }
 	
-	public function hasType($type) {
+	public function hasRestricted() {
 		foreach ($this->items as $relation) {
-			if ($relation->type === $type)
+			if ($relation->ondelete === Relation::ONDELETE_RESTRICT)
 				return true;
 		}
 		return false;
 	}
 	
-	public function restrict($entityName, $foreignKey = null) {
-		return $this->add(Relation::TYPE_RESTRICT, $entityName, $foreignKey);
+	public function restrict($entity, $foreignKey = null) {
+		return $this->add(Relation::ONDELETE_RESTRICT, $entity, $foreignKey);
 	}
 	
-	public function cascade($entityName, $foreignKey = null) {
-		return $this->add(Relation::TYPE_CASCADE, $entityName, $foreignKey);
+	public function cascade($entity, $foreignKey = null) {
+		return $this->add(Relation::ONDELETE_CASCADE, $entity, $foreignKey);
 	}
 	
-	private function add($type, $entityName, $foreignKey = null) {
+	private function add($entity, $ondelete, $foreignKey = null) {
 		if (null === $foreignKey)
 			$foreignKey = $this->entity->foreignKey;
 		
-		$entity = Api::factory($entityName);
-		foreach ($entity->select([
+		$api = Api::factory($entity);
+		foreach ($api->select([
 			$foreignKey => $this->entity->id
 		]) as $item) {
-			$this->addRelation(new Relation($item, $type));
+			$this->addRelation(new Relation($item, $ondelete));
 		}
 		
 		return $this;
@@ -75,6 +75,7 @@ class Relations implements Iterator{
 		}
 		
 		$this->items[] = $relation;
+		
 		foreach ($relation->entity->getRelations() as $r) {
 			$this->addRelation($r);
 		}
