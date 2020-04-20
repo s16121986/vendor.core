@@ -67,6 +67,14 @@ class Radio extends Xhtml{
 		return true;
 	}
 
+	public function getValue() {
+		$value = parent::getValue();
+		if (null === $value && false === $this->emptyItem && $this->_items) {
+			return $this->_items[0]->value;
+		}
+		return $value;
+	}
+
 	protected function prepareValue($value) {
 		return self::getValueId($value);
 	}
