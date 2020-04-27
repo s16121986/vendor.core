@@ -3,7 +3,7 @@ namespace Api\Util;
 
 use Iterator;
 
-class SelectResult implements Iterator{
+class SelectResult implements Iterator, Countable {
 	
 	private $items = [];
     private $position = 0;
@@ -31,6 +31,10 @@ class SelectResult implements Iterator{
     public function valid() {
         return isset($this->items[$this->position]);
     }
+	
+	public function count() {
+		return count($this->items);
+	}
 	
 	public function isEmpty() {
 		return empty($this->items);
