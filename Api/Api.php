@@ -4,6 +4,7 @@ use Api\Util\TabularSection;
 use Api\Attribute\Exception as AttributeException;
 use Api\Util\DeleteTransaction;
 use Api\Util\Relations;
+use Api\Util\SelectResult;
 use Api\Attribute\AttributeFile;
 use Api\Attribute\AttributeNumber;
 use Api\Attribute\AttributePredefined;
@@ -193,7 +194,7 @@ abstract class Api extends Api\Util\BaseApi{
 			$api->_setRecord($row);
 			$items[] = $api;
 		}
-		return $items;
+		return new SelectResult($items);
 	}
 
 	public function count($data = null) {
