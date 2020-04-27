@@ -2,6 +2,7 @@
 namespace Api\Util;
 
 use Iterator;
+use Countable;
 
 class SelectResult implements Iterator, Countable {
 	
