@@ -1,19 +1,7 @@
 {
-	"name": "s16121986/core",
-	"type": "core-library",
+	"name": "core/src",
 	"description": "Core library",
 	"require": {
-		"php": "^7.1",
-		"composer/installers": "~1.0"
-	},
-	"extra": {
-		"paths": {
-			"s16121986/core": "_core3"
-		},
-        "installer-paths": {
-            "_core1": ["s16121986/core"],
-            "_core2": ["type:core-library"]
-        }
-    }
+		"php": "^7.1"
+	}
 }
-
