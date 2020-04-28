@@ -9,7 +9,7 @@ class SelectResult implements Iterator, Countable {
 	private $items = [];
     private $position = 0;
 	
-	public function __construct(array $items) {
+	public function __construct(array $items = []) {
 		$this->items = $items;
 	}
 

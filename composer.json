@@ -1,0 +1,8 @@
+{
+	"name": "s16121986/vendor.core",
+	"description": "Core library",
+	"require": {
+		"php": "^7.1"
+	}
+}
+
