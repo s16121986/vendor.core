@@ -69,6 +69,10 @@ class SelectResult implements Iterator, Countable {
 		return new SelectResult($newItems);
 	}
 	
+	public function shift() {
+		return array_shift($this->items);
+	}
+	
 	public function get(array $filter) {
 		foreach ($this->items as $item) {
 			foreach ($filter as $k => $v) {
@@ -101,6 +105,11 @@ class SelectResult implements Iterator, Countable {
 	
 	public function map(callable $callable) {
 		return array_map($callable, $this->items);
+	}
+	
+	public function clear() {
+		$this->items = [];
+		return $this;
 	}
 	
 	public function toArray(/*[attribute names, ...]*/) {

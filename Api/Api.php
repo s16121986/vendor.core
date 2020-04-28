@@ -296,6 +296,10 @@ abstract class Api extends Api\Util\BaseApi{
 		return true;
 	}
 	
+	public function empty() {
+		return new SelectResult();
+	}
+	
 	public function getRelations() {
 		return new Relations($this);
 	}
