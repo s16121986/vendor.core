@@ -1,8 +1,10 @@
 {
-	"name": "s16121986/vendor.core",
+	"name": "s16121986/core",
+	"type": "core-library",
 	"description": "Core library",
 	"require": {
-		"php": "^7.1"
+		"php": "^7.1",
+		"composer/installers": "~1.0"
 	}
 }
 
