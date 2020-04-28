@@ -76,6 +76,18 @@ class SelectResult implements Iterator, Countable {
 		return array_shift($this->items);
 	}
 	
+	public function first() {
+		return empty($this->items) ? null : $this->items[0];
+	}
+	
+	public function last() {
+		return empty($this->items) ? null : $this->items[count($this->items) - 1];
+	}
+	
+	public function eq($index) {
+		return isset($this->items[$index]) ? $this->items[$index] : null;
+	}
+	
 	public function get(array $filter) {
 		foreach ($this->items as $item) {
 			foreach ($filter as $k => $v) {
