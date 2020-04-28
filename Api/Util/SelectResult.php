@@ -1,6 +1,7 @@
 <?php
 namespace Api\Util;
 
+use Api;
 use Iterator;
 use Countable;
 
@@ -41,11 +42,16 @@ class SelectResult implements Iterator, Countable {
 		return empty($this->items);
 	}
 	
-	public function add(array $items) {
-		foreach ($items as $item) {
-			if ($this->hasId($item->id))
-				continue;
-			$this->items[] = $item;
+	public function add($items) {
+		if (is_iterable($items)) {
+			foreach ($items as $item) {
+				if ($this->hasId($item->id))
+					continue;
+				$this->items[] = $item;
+			}
+		} else if ($items instanceof Api) {
+			if (!$this->hasId($item->id))
+				$this->items[] = $item;
 		}
 		return $this;
 	}
