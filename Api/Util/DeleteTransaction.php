@@ -95,7 +95,7 @@ abstract class DeleteTransaction{
 		self::$cache[] = $uid;
 		
 		$relations = $api->getRelations();
-		if (!self::$forced && $relations->hasType('restrict'))
+		if (!self::$forced && $relations->hasRestricted())
 			throw new Exception('Delete aborted', Exception::DELETE_RESTRICTED, $relations);
 		
 		foreach ($relations as $relation) {
