@@ -91,10 +91,10 @@ class SelectResult implements Iterator, Countable {
 	public function get(array $filter) {
 		foreach ($this->items as $item) {
 			foreach ($filter as $k => $v) {
-				if ($item->$k === $v)
-					continue;
-				return $item;
+				if ($item->$k !== $v)
+					continue 2;
 			}
+			return $item;
 		}
 		return null;
 	}
@@ -104,18 +104,11 @@ class SelectResult implements Iterator, Countable {
 	}
 	
 	public function has(array $filter) {
-		foreach ($this->items as $item) {
-			foreach ($filter as $k => $v) {
-				if ($item->$k === $v)
-					continue;
-				return true;
-			}
-		}
 		return (bool)$this->get($filter);
 	}
 	
 	public function hasId($id) {
-		return $this->has(['id' => $id]);
+		return (bool)$this->get(['id' => $id]);
 	}
 	
 	public function map(callable $callable) {
