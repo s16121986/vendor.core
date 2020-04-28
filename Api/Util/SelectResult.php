@@ -4,6 +4,7 @@ namespace Api\Util;
 use Api;
 use Iterator;
 use Countable;
+use Exception;
 
 class SelectResult implements Iterator, Countable {
 	
@@ -50,9 +51,11 @@ class SelectResult implements Iterator, Countable {
 				$this->items[] = $item;
 			}
 		} else if ($items instanceof Api) {
-			if (!$this->hasId($item->id))
-				$this->items[] = $item;
-		}
+			if (!$this->hasId($items->id))
+				$this->items[] = $items;
+		} else
+			throw new Exception('Invalid item type');
+		
 		return $this;
 	}
 	
