@@ -2,12 +2,10 @@
 
 namespace Api;
 
-use Api;
 use Db;
 use File as BaseFile;
 use File\Part as FilePart;
-
-//use Exception;
+use Exception;
 
 class File extends BaseFile {
 
@@ -17,8 +15,8 @@ class File extends BaseFile {
 	private static $config;
 	private static $table = 'files';
 	private static $tableParts = 'file_parts';
-	protected $model;
 	protected $parts = null;
+	protected $flagContent = false;
 
 	public static function setConfig($config) {
 		self::$config = $config;
@@ -45,7 +43,7 @@ class File extends BaseFile {
 		}
 
 		$isValid = false;
-		$q = Db::from(self::$table, '*');
+		$q = Db::from(self::$table, ['id', 'guid', 'type', 'parent_id', 'name', 'extension', 'mime_type', 'size', 'mtime', 'index', 'created']);
 
 		foreach ($params as $k => $v) {
 			if (empty($v))
@@ -122,32 +120,30 @@ class File extends BaseFile {
 
 	public function __set($name, $value) {
 		parent::__set($name, $value);
-		
+
 		if ($name === 'guid') {
+			if ($this->guid === $value)
+				return;
+
+			if (!$this->guid && !$this->content && $this->exists())
+				$this->setContent($this->getContents());
+
 			$this
+					->_set('tmp_name', null)
 					->_set('path', self::getPath($this->guid, true))
 					->_set('fullname', self::getDestination($this->guid, true));
 		}
 	}
 
-	public function setModel(Api $monel) {
-		$this->model = $monel;
-		return $this;
-	}
-
-	public function setType($type) {
-		$this->_set('type', $type);
-		return $this;
-	}
-	
 	public function getParts() {
 		if (!$this->id)
 			return [];
+
 		else if (null !== $this->parts)
 			return $this->parts;
-		
+
 		$this->parts = [];
-		
+
 		$q = Db::from(self::$tableParts, ['index'])
 				->where('file_id=?', $this->id)
 				->query();
@@ -156,21 +152,21 @@ class File extends BaseFile {
 			$part->init();
 			$this->parts[$r['index']] = $part;
 		}
-		
+
 		return $this->parts;
 	}
 
 	public function addPart($content) {
 		if (null === $this->parts)
 			$this->parts = [];
-		
+
 		$part = new FilePart($this, [
 			'index' => count($this->parts) + 1,
 			'data' => $content
 		]);
 		$part->init();
 		$this->parts[] = $part;
-		
+
 		return $this;
 	}
 
@@ -186,52 +182,49 @@ class File extends BaseFile {
 	public function write() {
 		if ($this->isEmpty())
 			return false;
-		
+
 		$isNew = $this->isNew();
-		
-		if ($isNew) {
-			if ($this->exists())
-				$this->setContent($this->getContents());
-
-			$this->_set('guid', self::getNewGuid());
-
-			$this->init();
-
-			if ($this->exists())
-				$this->unlink();
-
-			self::checkPath($this->guid);
-
-			if (false === ($fh = fopen($this->fullname, 'w+')))
-				throw new Exception('Cant create file');
-
-			fwrite($fh, $this->getContents());
-			fclose($fh);
-
-			self::chmod($this->fullname, 'file');
-
-			if ($this->model && !$this->model->isNew())
-				$this->_set('parent_id', $this->model->id);
-		}
 
 		$data = [];
-		$data['path'] = self::getPath($this->guid, false);
-		$data['fullname'] = self::getDestination($this->guid, false);
-		foreach (['guid', 'type', 'parent_id', 'name', 'extension', 'mime_type', 'size', 'mtime', 'index'] as $key) {
-			if (null !== $this->$key) {
+
+		if ($isNew) {
+			$this->_set('guid', self::getNewGuid());
+			$data['guid'] = $this->guid;
+			$data['path'] = self::getPath($this->guid, false);
+			$data['fullname'] = self::getDestination($this->guid, false);
+			foreach (['guid', 'type', 'parent_id'] as $key) {
 				$data[$key] = $this->$key;
 			}
 		}
 
-		if ($this->isNew())
+		foreach (['name', 'extension', 'mime_type', 'size', 'mtime', 'index'] as $key) {
+			$data[$key] = $this->$key;
+		}
+
+		if ($isNew || $this->flagContent)
 			$data['created'] = 'CURRENT_TIMESTAMP';
 
 		$id = Db::write(self::$table, $data, $this->id);
 		if (!$id)
 			return false;
-		
+
+		if ($this->flagContent) {
+			self::checkPath($this->guid);
+
+			if (false === ($fh = fopen($this->fullname, 'w')))
+				throw new Exception('Cant create file');
+
+			fwrite($fh, $this->content);
+			fclose($fh);
+
+			self::chmod($this->fullname, 'file');
+
+			$this->flagContent = false;
+			$this->content = null;
+		}
+
 		$this->_set('id', $id);
-		
+
 		if ($isNew) {
 			foreach ($this->parts as $part) {
 				$fh = fopen($part->fullname, 'w+');
@@ -268,6 +261,17 @@ class File extends BaseFile {
 		}
 
 		return Db::delete(self::$table, 'id=' . $this->id);
+	}
+
+	public function reset() {
+		$this->parts = null;
+		$this->flagContent = false;
+		return parent::reset();
+	}
+
+	public function setContent($content) {
+		$this->flagContent = true;
+		return parent::setContent($content);
 	}
 
 	public function __toString() {

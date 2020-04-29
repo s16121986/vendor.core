@@ -31,14 +31,18 @@ class AttributeFile extends AbstractAttribute {
 		if (is_string($data)) {
 			$file = ApiFile::getByGuid($data);
 		} elseif ($data instanceof BaseFile) {
+			if (!$data->hasContent())
+				return null;
+
 			$data = $data->getData();
 			$data['type'] = $this->type;
+			$data['parent_id'] = $this->hasModel() ? $this->model->id : null;
 			$file = new ApiFile($data);
 		}
-		if ($file && parent::checkValue($file)) {
-			$file->setModel($this->model);
+
+		if ($file && parent::checkValue($file))
 			return $file;
-		}
+
 		return null;
 	}
 
@@ -115,11 +119,11 @@ class AttributeFile extends AbstractAttribute {
 			return true;
 
 		if (!$this->multiple) {
-			//$file->delete();
 			foreach ($this->select() as $file) {
-				foreach (['id', 'guid', 'type', 'parent_id', 'index'] as $k) {
+				foreach (['id', 'parent_id', 'type', 'guid', 'index'] as $k) {
 					$files[0]->$k = $file->$k;
 				}
+
 				break;
 			}
 		}

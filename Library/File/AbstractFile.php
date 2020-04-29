@@ -19,12 +19,17 @@ abstract class AbstractFile {
 
 	public function __get($name) {
 		switch ($name) {
-			case 'size':return $this->getSize();
-			case 'mtime':return $this->mtime();
+			case 'size':
+				return $this->getSize();
+			case 'mtime':
+				return $this->mtime();
 			case 'mtype':
 			case 'mime_type':
 				return Util::getMimeType($this);
+			case 'content':
+				return $this->content;
 		}
+
 		return (isset($this->data[$name]) ? $this->data[$name] : null);
 	}
 
@@ -33,7 +38,7 @@ abstract class AbstractFile {
 			case 'name':
 				if (!$value)
 					break;
-				
+
 				$tmp = explode('.', $value);
 				$this
 						->_set('extension', strtolower(array_pop($tmp)))
@@ -42,7 +47,7 @@ abstract class AbstractFile {
 			case 'fullname':
 				if (!$value)
 					break;
-				
+
 				$tmp = explode('/', $value);
 				$this
 						->_set('name', array_pop($tmp))
@@ -51,11 +56,11 @@ abstract class AbstractFile {
 			case 'path':
 				if (!$value || $this->fullname || !$this->name)
 					break;
-				
+
 				$this->_set('fullname', $value . $this->name);
 				break;
 		}
-		
+
 		$this->_set($name, $value);
 	}
 
@@ -110,16 +115,21 @@ abstract class AbstractFile {
 		return $this;
 	}
 
+	public function hasContent() {
+		return null !== $this->content || $this->exists();
+	}
+
 	public function isEmpty() {
 		return empty($this->data);
 	}
 
 	public function exists() {
-		return !$this->isEmpty() && file_exists($this->fullname);
+		return $this->fullname && file_exists($this->fullname);
 	}
 
 	public function reset() {
 		$this->data = [];
+		$this->content = null;
 		return $this;
 	}
 
