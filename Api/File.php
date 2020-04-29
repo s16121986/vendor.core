@@ -119,20 +119,27 @@ class File extends BaseFile {
 	}
 
 	public function __set($name, $value) {
-		parent::__set($name, $value);
+		switch ($name) {
+			case 'guid':
+				if ($this->guid === $value)
+					return;
 
-		if ($name === 'guid') {
-			if ($this->guid === $value)
-				return;
+				if (!$this->guid && !$this->content && $this->exists())
+					$this->setContent($this->getContents());
 
-			if (!$this->guid && !$this->content && $this->exists())
-				$this->setContent($this->getContents());
-
-			$this
-					->_set('tmp_name', null)
-					->_set('path', self::getPath($this->guid, true))
-					->_set('fullname', self::getDestination($this->guid, true));
+				$this
+						->_set('tmp_name', null)
+						->_set('path', self::getPath($value, true))
+						->_set('fullname', self::getDestination($value, true));
+				break;
+			case 'path':
+			case 'fullname':
+				if ($this->guid)
+					return;
+				break;
 		}
+		
+		parent::__set($name, $value);
 	}
 
 	public function getParts() {

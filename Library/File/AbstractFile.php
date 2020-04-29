@@ -70,7 +70,10 @@ abstract class AbstractFile {
 	}
 
 	public function getSize() {
-		return ($this->exists() ? filesize($this->fullname) : false);
+		if (null !== $this->content)
+			return strlen($this->content);
+		
+		return $this->exists() ? filesize($this->fullname) : false;
 	}
 
 	public function mtime() {
