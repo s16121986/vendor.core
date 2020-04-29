@@ -2,7 +2,6 @@
 namespace Grid;
 
 use Api;
-use Iterator;
 
 class Data{
 	
@@ -49,7 +48,7 @@ class Data{
 	public function set($data) {
 		if ($data instanceof Api) {
 			$this->api = $data;
-		} elseif (is_array($data) || $data instanceof Iterator) {
+		} elseif (is_iterable($data)) {
 			$this->data = $data;
 		}
 		return $this;

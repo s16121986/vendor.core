@@ -1,8 +1,6 @@
 <?php
 namespace Form\Element;
 
-use Iterator;
-
 class Select extends Xhtml{
 
 	const EMPTY_VALUE = '';
@@ -109,7 +107,7 @@ class Select extends Xhtml{
 				$itemsTemp = $this->getDBItems($itemsData);
 				unset($itemsData['where'], $itemsData['order'], $itemsData['text'], $itemsData['value'], $itemsData['table']);
 			}
-			if (is_array($itemsData)) {
+			if (is_iterable($itemsData)) {
 				foreach ($itemsData as $v) {
 					$this->initGroup($v);
 				}
@@ -131,7 +129,7 @@ class Select extends Xhtml{
 				$itemsTemp = $this->getDBItems($itemsData);
 				unset($itemsData['where'], $itemsData['order'], $itemsData['text'], $itemsData['value'], $itemsData['table']);
 			}
-			if (is_array($itemsData) || $itemsData instanceof Iterator) {
+			if (is_iterable($itemsData)) {
 				foreach ($itemsData as $k => $v) {
 					$this->initItem($k, $v);
 				}

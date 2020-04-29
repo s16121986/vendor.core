@@ -51,7 +51,7 @@ class Radio extends Xhtml{
 				$itemsTemp = self::getDBItems($itemsData);
 				unset($itemsData['where'], $itemsData['order'], $itemsData['text'], $itemsData['value'], $itemsData['table']);
 			}
-			if (is_array($itemsData)) {
+			if (is_iterable($itemsData)) {
 				foreach ($itemsData as $k => $v) {
 					$this->initItem($k, $v);
 				}
