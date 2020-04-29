@@ -34,19 +34,19 @@ abstract class AbstractFile {
 				if (!$value)
 					break;
 				
-				$name = explode('.', $value);
+				$tmp = explode('.', $value);
 				$this
-						->_set('extension', strtolower(array_pop($name)))
-						->_set('basename', implode('.', $name));
+						->_set('extension', strtolower(array_pop($tmp)))
+						->_set('basename', implode('.', $tmp));
 				break;
 			case 'fullname':
 				if (!$value)
 					break;
 				
-				$name = explode('/', $value);
+				$tmp = explode('/', $value);
 				$this
-						->_set('name', array_pop($name))
-						->_set('path', implode('/', $name));
+						->_set('name', array_pop($tmp))
+						->_set('path', implode('/', $tmp));
 				break;
 			case 'path':
 				if (!$value || $this->fullname || !$this->name)
