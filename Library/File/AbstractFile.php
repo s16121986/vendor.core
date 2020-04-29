@@ -72,7 +72,7 @@ abstract class AbstractFile {
 	public function getSize() {
 		if (null !== $this->content)
 			return strlen($this->content);
-		
+
 		return $this->exists() ? filesize($this->fullname) : false;
 	}
 

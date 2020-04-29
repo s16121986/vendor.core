@@ -138,7 +138,7 @@ class File extends BaseFile {
 					return;
 				break;
 		}
-		
+
 		parent::__set($name, $value);
 	}
 

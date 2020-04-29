@@ -6,7 +6,7 @@ abstract class Util {
 
 	public static function getMimeType(AbstractFile $file) {
 		$finfo = new \finfo(FILEINFO_MIME_TYPE);
-		
+
 		if ($file->content)
 			return $finfo->buffer($file->content);
 		else if ($file->tmp_name)
