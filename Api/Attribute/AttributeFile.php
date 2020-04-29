@@ -1,11 +1,12 @@
 <?php
+
 namespace Api\Attribute;
 
 use File\AbstractFile as BaseFile;
 use Api\File as ApiFile;
 use Db;
 
-class AttributeFile extends AbstractAttribute{
+class AttributeFile extends AbstractAttribute {
 
 	protected $plugins = [];
 	protected $qualifiers = [
@@ -40,7 +41,7 @@ class AttributeFile extends AbstractAttribute{
 		}
 		return null;
 	}
-	
+
 	protected function hasModel() {
 		return $this->model && !$this->model->isEmpty();
 	}
@@ -65,11 +66,11 @@ class AttributeFile extends AbstractAttribute{
 	public function checkValue($value) {
 		if ($this->multiple)
 			return is_array($value);
-		
+
 		if (($file = $this->fileFactory($value)))
 			return parent::checkValue($file);
-		
-		return false;//(is_string($value) || $value instanceof \File);
+
+		return false; //(is_string($value) || $value instanceof \File);
 	}
 
 	public function prepareValue($value) {
@@ -78,7 +79,7 @@ class AttributeFile extends AbstractAttribute{
 			$value = [];
 			if (is_string($valueTemp))
 				$valueTemp = [$valueTemp];
-			
+
 			if (is_array($valueTemp)) {
 				foreach ($valueTemp as $data) {
 					if (($file = $this->fileFactory($data))) {
@@ -94,10 +95,10 @@ class AttributeFile extends AbstractAttribute{
 
 	public function write() {
 		$value = $this->getValue();
-		
+
 		if (!$value)
 			return false;
-			
+
 		if (!is_array($value))
 			$value = [$value];
 
@@ -113,33 +114,39 @@ class AttributeFile extends AbstractAttribute{
 		if (empty($files))
 			return true;
 
-		if (!$this->multiple)
-			$this->delete();
+		if (!$this->multiple) {
+			//$file->delete();
+			foreach ($this->select() as $file) {
+				$files[0]->id = $file->id;
+				break;
+			}
+		}
 
 		foreach ($files as $file) {
 			$this->initPlugins($file);
 			$file->write();
 		}
+
 		return true;
 	}
 
 	public function select() {
 		if (!$this->hasModel())
 			return [];
-		
+
 		$files = [];
-		
-		$q = Db::from('files')
-			->order('index')
-			->where('parent_id=' . $this->model->id . ' AND type=' . $this->type)
-			->query();
-		
+
+		$q = Db::from(ApiFile::config('table'))
+				->order('index')
+				->where('parent_id=' . $this->model->id . ' AND type=' . $this->type)
+				->query();
+
 		while ($r = $q->fetch()) {
-			$file = new \Api\File($r);
+			$file = new ApiFile($r);
 			$file->setModel($this->model);
 			$files[] = $file;
 		}
-		
+
 		return $files;
 	}
 
