@@ -136,7 +136,7 @@ class AttributeFile extends AbstractAttribute {
 
 		$files = [];
 
-		$q = Db::from(ApiFile::config('table'))
+		$q = Db::from('files')
 				->order('index')
 				->where('parent_id=' . $this->model->id . ' AND type=' . $this->type)
 				->query();
