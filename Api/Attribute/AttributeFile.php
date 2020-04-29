@@ -117,7 +117,9 @@ class AttributeFile extends AbstractAttribute {
 		if (!$this->multiple) {
 			//$file->delete();
 			foreach ($this->select() as $file) {
-				$files[0]->id = $file->id;
+				foreach (['id', 'guid', 'type', 'parent_id', 'index'] as $k) {
+					$files[0]->$k = $file->$k;
+				}
 				break;
 			}
 		}
@@ -154,6 +156,7 @@ class AttributeFile extends AbstractAttribute {
 		foreach ($this->select() as $file) {
 			$file->delete();
 		}
+
 		return true;
 	}
 

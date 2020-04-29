@@ -4,25 +4,16 @@ use File\AbstractFile;
 
 class File extends AbstractFile {
 
-	protected function init() {
-		if ($this->fullname) {
-			$name = explode('/', $this->fullname);
-			$this
-					->_set('name', array_pop($name))
-					->_set('path', implode('/', $name));
-		} elseif ($this->path)
-			$this->_set('fullname', $this->path . $this->name);
-		elseif ($this->tmp_name)
-			$this->_set('fullname', $this->tmp_name);
-
-		if ($this->name) {
-			$name = explode('.', $this->name);
-			$this
-					->_set('extension', strtolower(array_pop($name)))
-					->_set('basename', implode('.', $name));
+	public function __set($name, $value) {
+		switch ($name) {
+			case 'tmp_name':
+				if (!$value)
+					break;
+				
+				$this->_set('fullname', $value);
+				break;
 		}
-
-		return $this;
+		parent::__set($name, $value);
 	}
 
 	public function __toString() {

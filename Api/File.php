@@ -18,7 +18,7 @@ class File extends BaseFile {
 	private static $table = 'files';
 	private static $tableParts = 'file_parts';
 	protected $model;
-	protected $parts = [];
+	protected $parts = null;
 
 	public static function setConfig($config) {
 		self::$config = $config;
@@ -120,28 +120,13 @@ class File extends BaseFile {
 			chown($filename, $user);
 	}
 
-	protected function init() {
-		if (!$this->guid)
-			return;
-
-		$this->_set('path', self::getPath($this->guid, true));
-		$name = explode('.', $this->name);
-		$this
-				->_set('extension', strtolower(array_pop($name)))
-				->_set('basename', implode('.', $name))
-				->_set('fullname', self::getDestination($this->guid, true)/* . '.' . $this->extension */);
-
-		foreach ($this->parts as $part) {
-			$part->init();
-		}
-
-		if ($this->id) {
-			$q = Db::from(self::$tableParts, ['index'])
-					->where('file_id=?', $this->id)
-					->query();
-			while ($r = $q->fetch()) {
-				$this->parts[$r['index']] = new FilePart($this, $r);
-			}
+	public function __set($name, $value) {
+		parent::__set($name, $value);
+		
+		if ($name === 'guid') {
+			$this
+					->_set('path', self::getPath($this->guid, true))
+					->_set('fullname', self::getDestination($this->guid, true));
 		}
 	}
 
@@ -154,16 +139,43 @@ class File extends BaseFile {
 		$this->_set('type', $type);
 		return $this;
 	}
+	
+	public function getParts() {
+		if (!$this->id)
+			return [];
+		else if (null !== $this->parts)
+			return $this->parts;
+		
+		$this->parts = [];
+		
+		$q = Db::from(self::$tableParts, ['index'])
+				->where('file_id=?', $this->id)
+				->query();
+		while ($r = $q->fetch()) {
+			$part = new FilePart($this, $r);
+			$part->init();
+			$this->parts[$r['index']] = $part;
+		}
+		
+		return $this->parts;
+	}
 
 	public function addPart($content) {
-		$this->parts[] = new FilePart($this, [
+		if (null === $this->parts)
+			$this->parts = [];
+		
+		$part = new FilePart($this, [
 			'index' => count($this->parts) + 1,
 			'data' => $content
 		]);
+		$part->init();
+		$this->parts[] = $part;
+		
 		return $this;
 	}
 
 	public function getPart($index) {
+		$this->getParts();
 		return (isset($this->parts[$index]) ? $this->parts[$index] : null);
 	}
 
@@ -174,8 +186,10 @@ class File extends BaseFile {
 	public function write() {
 		if ($this->isEmpty())
 			return false;
-
-		if ($this->isNew()) {
+		
+		$isNew = $this->isNew();
+		
+		if ($isNew) {
 			if ($this->exists())
 				$this->setContent($this->getContents());
 
@@ -213,24 +227,26 @@ class File extends BaseFile {
 			$data['created'] = 'CURRENT_TIMESTAMP';
 
 		$id = Db::write(self::$table, $data, $this->id);
-		if ($id) {
-			if ($this->isNew()) {
-				foreach ($this->parts as $part) {
-					$fh = fopen($part->fullname, 'w+');
-					fwrite($fh, $part->getContents());
-					fclose($fh);
-					self::chmod($part->fullname, 'file');
-					Db::insert(self::$tableParts, [
-						'file_id' => $id,
-						'name' => $part->name,
-						'fullname' => $part->fullname,
-						'size' => $part->size,
-						'mtime' => $part->mtime,
-						'index' => $part->index
-					]);
-				}
+		if (!$id)
+			return false;
+		
+		$this->_set('id', $id);
+		
+		if ($isNew) {
+			foreach ($this->parts as $part) {
+				$fh = fopen($part->fullname, 'w+');
+				fwrite($fh, $part->getContents());
+				fclose($fh);
+				self::chmod($part->fullname, 'file');
+				Db::insert(self::$tableParts, [
+					'file_id' => $id,
+					'name' => $part->name,
+					'fullname' => $part->fullname,
+					'size' => $part->size,
+					'mtime' => $part->mtime,
+					'index' => $part->index
+				]);
 			}
-			$this->_set('id', $id);
 		}
 
 		return $id;

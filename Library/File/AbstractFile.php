@@ -5,6 +5,7 @@ namespace File;
 abstract class AbstractFile {
 
 	protected $data = [];
+	protected $content = null;
 
 	public function __construct($data = null) {
 		if (!$data)
@@ -15,8 +16,6 @@ abstract class AbstractFile {
 
 		$this->setData($data);
 	}
-
-	abstract protected function init();
 
 	public function __get($name) {
 		switch ($name) {
@@ -30,6 +29,33 @@ abstract class AbstractFile {
 	}
 
 	public function __set($name, $value) {
+		switch ($name) {
+			case 'name':
+				if (!$value)
+					break;
+				
+				$name = explode('.', $value);
+				$this
+						->_set('extension', strtolower(array_pop($name)))
+						->_set('basename', implode('.', $name));
+				break;
+			case 'fullname':
+				if (!$value)
+					break;
+				
+				$name = explode('/', $value);
+				$this
+						->_set('name', array_pop($name))
+						->_set('path', implode('/', $name));
+				break;
+			case 'path':
+				if (!$value || $this->fullname || !$this->name)
+					break;
+				
+				$this->_set('fullname', $value . $this->name);
+				break;
+		}
+		
 		$this->_set($name, $value);
 	}
 
@@ -56,9 +82,9 @@ abstract class AbstractFile {
 
 	public function setData(array $data) {
 		foreach ($data as $k => $v) {
-			$this->data[$k] = $v;
+			$this->$k = $v;
 		}
-		$this->init();
+
 		return $this;
 	}
 
@@ -67,8 +93,8 @@ abstract class AbstractFile {
 	}
 
 	public function getContents() {
-		if (isset($this->data['data']))
-			return $this->data['data'];
+		if (null !== $this->content)
+			return $this->content;
 
 		if ($this->tmp_name && file_exists($this->tmp_name))
 			return file_get_contents($this->tmp_name);
@@ -80,8 +106,7 @@ abstract class AbstractFile {
 	}
 
 	public function setContent($content) {
-		$this->data['data'] = $content;
-		$this->init();
+		$this->content = $content;
 		return $this;
 	}
 
