@@ -148,9 +148,7 @@ class AttributeFile extends AbstractAttribute {
 				->query();
 
 		while ($r = $q->fetch()) {
-			$file = new ApiFile($r);
-			$file->setModel($this->model);
-			$files[] = $file;
+			$files[] = new ApiFile($r);
 		}
 
 		return $files;
