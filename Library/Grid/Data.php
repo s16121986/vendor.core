@@ -74,7 +74,7 @@ class Data{
 			$this->paginator->setCount($this->count($params));
 			$params = $this->getParams();
 		}
-		$this->set($this->api->select($params));
+		$this->set($this->api->select($params)->getItems());
 		return $this->data;
 	}
 	

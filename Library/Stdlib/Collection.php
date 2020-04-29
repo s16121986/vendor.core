@@ -39,6 +39,10 @@ class Collection implements Iterator, Countable {
 	public function count() {
 		return count($this->items);
 	}
+	
+	public function getItems() {
+		return $this->items;
+	}
 
 	public function isEmpty() {
 		return empty($this->items);
