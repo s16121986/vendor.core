@@ -143,7 +143,7 @@ class File extends BaseFile {
 					->_set('path', self::getPath($value, true))
 					->_set('fullname', self::getDestination($value, true));
 
-		parent::_set($name, $value);
+		return parent::_set($name, $value);
 	}
 
 	public function __set($name, $value) {
