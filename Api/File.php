@@ -16,7 +16,6 @@ class File extends BaseFile {
 	private static $table = 'files';
 	private static $tableParts = 'file_parts';
 	protected $parts = null;
-	protected $flagContent = false;
 
 	public static function setConfig($config) {
 		self::$config = $config;
@@ -117,21 +116,25 @@ class File extends BaseFile {
 		if (($user = self::config('user')))
 			chown($filename, $user);
 	}
+	
+	private static function fwrite($file) {
+		if (false === ($fh = fopen($file->fullname, 'w')))
+			throw new Exception('Cant create file');
+
+		fwrite($fh, $file->getContents());
+		fclose($fh);
+
+		self::chmod($file->fullname, 'file');
+
+		$file->content = null;
+		
+		return true;
+	}
 
 	public function __set($name, $value) {
 		switch ($name) {
 			case 'guid':
-				if ($this->guid === $value)
-					return;
-
-				if (!$this->guid && !$this->content && $this->exists())
-					$this->setContent($this->getContents());
-
-				$this
-						->_set('tmp_name', null)
-						->_set('path', self::getPath($value, true))
-						->_set('fullname', self::getDestination($value, true));
-				break;
+				return;
 			case 'path':
 			case 'fullname':
 				if ($this->guid)
@@ -189,55 +192,54 @@ class File extends BaseFile {
 	public function write() {
 		if ($this->isEmpty())
 			return false;
+		
+		if (!$this->guid && null === $this->content && $this->exists())
+			$this->setContent($this->getContents());
+		
+		if (null === $this->content)
+			throw new Exception('File content empty');
 
 		$isNew = $this->isNew();
-
+		
+		$guid = self::getNewGuid();
+		
 		$data = [];
-
+		$data['guid'] = $guid;
+		$data['path'] = self::getPath($guid, false);
+		$data['fullname'] = self::getDestination($guid, false);
+		$data['created'] = 'CURRENT_TIMESTAMP';
+		
 		if ($isNew) {
-			$this->_set('guid', self::getNewGuid());
-			$data['guid'] = $this->guid;
-			$data['path'] = self::getPath($this->guid, false);
-			$data['fullname'] = self::getDestination($this->guid, false);
-			foreach (['guid', 'type', 'parent_id'] as $key) {
-				$data[$key] = $this->$key;
-			}
+			$data['type'] = $this->type;
+			$data['parent_id'] = $this->parent_id;
 		}
 
 		foreach (['name', 'extension', 'mime_type', 'size', 'mtime', 'index'] as $key) {
 			$data[$key] = $this->$key;
 		}
 
-		if ($isNew || $this->flagContent)
-			$data['created'] = 'CURRENT_TIMESTAMP';
-
 		$id = Db::write(self::$table, $data, $this->id);
 		if (!$id)
 			return false;
+		
+		if (!$isNew && $this->exists())
+			$this->unlink();
+		
+		$this
+				->_set('id', $id)
+				->_set('guid', $guid)
+				->_set('tmp_name', null)
+				->_set('path', self::getPath($guid, true))
+				->_set('fullname', self::getDestination($guid, true));
 
-		if ($this->flagContent) {
-			self::checkPath($this->guid);
+		self::checkPath($guid);
 
-			if (false === ($fh = fopen($this->fullname, 'w')))
-				throw new Exception('Cant create file');
+		self::fwrite($this);
 
-			fwrite($fh, $this->content);
-			fclose($fh);
-
-			self::chmod($this->fullname, 'file');
-
-			$this->flagContent = false;
-			$this->content = null;
-		}
-
-		$this->_set('id', $id);
-
-		if ($isNew) {
+		if ($this->parts) {
 			foreach ($this->parts as $part) {
-				$fh = fopen($part->fullname, 'w+');
-				fwrite($fh, $part->getContents());
-				fclose($fh);
-				self::chmod($part->fullname, 'file');
+				self::fwrite($part);
+				
 				Db::insert(self::$tableParts, [
 					'file_id' => $id,
 					'name' => $part->name,
@@ -272,13 +274,7 @@ class File extends BaseFile {
 
 	public function reset() {
 		$this->parts = null;
-		$this->flagContent = false;
 		return parent::reset();
-	}
-
-	public function setContent($content) {
-		$this->flagContent = true;
-		return parent::setContent($content);
 	}
 
 	public function __toString() {

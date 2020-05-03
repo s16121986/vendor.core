@@ -1,4 +1,5 @@
 <?php
+
 abstract class AttributeType extends Enum {
 
 	const String = 'string';
@@ -21,6 +22,7 @@ abstract class AttributeType extends Enum {
 	const Binary = 'binary';
 
 }
+
 abstract class ComparisonType extends Enum {
 
 	private static $_typesAssoc = [
@@ -48,7 +50,7 @@ abstract class ComparisonType extends Enum {
 	const NotEqual = 12;
 	const Contains = 13;
 	const NotContains = 14;
-	
+
 	public static function fromString($name) {
 		foreach (self::_getConstatnts() as $key => $value) {
 			if (strtolower($key) === $name) {
@@ -65,38 +67,42 @@ abstract class ComparisonType extends Enum {
 
 }
 
-abstract class SortDirection extends Enum{
+abstract class SortDirection extends Enum {
+
 	const ASC = 'asc';
 	const DESC = 'desc';
+
 }
 
-abstract class DateFractions extends Enum{
+abstract class DateFractions extends Enum {
+
 	const DATE = 'date';
 	const TIME = 'time';
 	const DATETIME = 'datetime';
+
 }
 
-abstract class AllowedSign extends Enum{
+abstract class AllowedSign extends Enum {
+
 	const ANY = 'any';
 	const NONNEGATIVE = 'nonnegative';
-}
-abstract class AllowedLength extends Enum{
-	const VARIABLE = 'variable';
-	const FIXED = 'fixed';
+
 }
 
-abstract class ActionParams extends Enum{
-	const ORDER = 'order';
-	const LIMIT = 'limit';
-	const COLUMNS = 'columns';
-	const GROUP = 'group';
+abstract class AllowedLength extends Enum {
+
+	const VARIABLE = 'variable';
+	const FIXED = 'fixed';
+
 }
 
 abstract class Chars {
+
 	const CR = "\r";
 	const VTab = "\v";
 	//const NBSp = " ";
 	const LF = "\n";
 	const FF = "\f";
 	const Tab = "\t";
+
 }

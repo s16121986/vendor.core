@@ -3,17 +3,17 @@ namespace Form;
 
 abstract class Element{
 
-	private static $_default = array(
+	private static $_default = [
 		'required' => false,
 		'render' => true
-	);
-	protected $_options = array();
+	];
+	protected $_options = [];
 	protected $_rendered = false;
 	protected $_error;
 	protected $_value = null;
 	protected $_label = null;
 	protected $_parent;
-	protected $_attributes = array();
+	protected $_attributes = [];
 
 	public static function factory($name, $type, $options = null) {
 		if (!is_array($options)) {
@@ -277,20 +277,20 @@ abstract class Element{
 	}
 	
 	protected function init() {}
-				
-
-	public static function escape($val) {
-		if (is_array($val)) {
-			$val = implode(',', $val);
-		} else if (is_float($val)) {
-			return str_replace(',', '.', $val);
-		}
-		return str_replace('"', '&quot;', $val);
-	}
 
 	public function render() {
 		$this->_rendered = true;
 		return $this->getHtml();
+	}
+				
+
+	public static function escape($val) {
+		if (is_array($val))
+			$val = implode(',', $val);
+		else if (is_float($val))
+			return str_replace(',', '.', $val);
+		
+		return str_replace('"', '&quot;', $val);
 	}
 
 }
