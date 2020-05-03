@@ -212,9 +212,15 @@ class File extends BaseFile {
 		if ($isNew) {
 			$data['type'] = $this->type;
 			$data['parent_id'] = $this->parent_id;
+			$data['index'] = Db::from('files', 'MAX(`index`)')
+					->where('parent_id=' . $this->parent_id)
+					->where('type=' . $this->type)
+					->query()->fetchColumn() + 1;
+		} else {
+			$data['index'] = $this->index ?: 0;
 		}
 
-		foreach (['name', 'extension', 'mime_type', 'size', 'mtime', 'index'] as $key) {
+		foreach (['name', 'extension', 'mime_type', 'size', 'mtime'] as $key) {
 			$data[$key] = $this->$key;
 		}
 
