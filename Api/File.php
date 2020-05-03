@@ -56,8 +56,13 @@ class File extends BaseFile {
 			return;
 
 		$data = $q->limit(1)->query()->fetchRow();
-		if ($data)
-			return new self($data);
+		if (!$data)
+			return false;
+
+		$file = new self($data);
+		$file->_set('guid', $data['guid']);
+
+		return $file;
 	}
 
 	public static function getDestination($guid, $fullPath = true) {
@@ -116,7 +121,7 @@ class File extends BaseFile {
 		if (($user = self::config('user')))
 			chown($filename, $user);
 	}
-	
+
 	private static function fwrite($file) {
 		if (false === ($fh = fopen($file->fullname, 'w')))
 			throw new Exception('Cant create file');
@@ -127,8 +132,18 @@ class File extends BaseFile {
 		self::chmod($file->fullname, 'file');
 
 		$file->content = null;
-		
+
 		return true;
+	}
+
+	protected function _set($name, $value) {
+		if ($name === 'guid')
+			$this
+					->_set('tmp_name', null)
+					->_set('path', self::getPath($value, true))
+					->_set('fullname', self::getDestination($value, true));
+
+		parent::_set($name, $value);
 	}
 
 	public function __set($name, $value) {
@@ -192,30 +207,30 @@ class File extends BaseFile {
 	public function write() {
 		if ($this->isEmpty())
 			return false;
-		
+
 		if (!$this->guid && null === $this->content && $this->exists())
 			$this->setContent($this->getContents());
-		
+
 		if (null === $this->content)
 			throw new Exception('File content empty');
 
 		$isNew = $this->isNew();
-		
+
 		$guid = self::getNewGuid();
-		
+
 		$data = [];
 		$data['guid'] = $guid;
 		$data['path'] = self::getPath($guid, false);
 		$data['fullname'] = self::getDestination($guid, false);
 		$data['created'] = 'CURRENT_TIMESTAMP';
-		
+
 		if ($isNew) {
 			$data['type'] = $this->type;
 			$data['parent_id'] = $this->parent_id;
 			$data['index'] = Db::from('files', 'MAX(`index`)')
-					->where('parent_id=' . $this->parent_id)
-					->where('type=' . $this->type)
-					->query()->fetchColumn() + 1;
+							->where('parent_id=' . $this->parent_id)
+							->where('type=' . $this->type)
+							->query()->fetchColumn() + 1;
 		} else {
 			$data['index'] = $this->index ?: 0;
 		}
@@ -227,16 +242,13 @@ class File extends BaseFile {
 		$id = Db::write(self::$table, $data, $this->id);
 		if (!$id)
 			return false;
-		
+
 		if (!$isNew && $this->exists())
 			$this->unlink();
-		
+
 		$this
 				->_set('id', $id)
-				->_set('guid', $guid)
-				->_set('tmp_name', null)
-				->_set('path', self::getPath($guid, true))
-				->_set('fullname', self::getDestination($guid, true));
+				->_set('guid', $guid);
 
 		self::checkPath($guid);
 
@@ -245,7 +257,7 @@ class File extends BaseFile {
 		if ($this->parts) {
 			foreach ($this->parts as $part) {
 				self::fwrite($part);
-				
+
 				Db::insert(self::$tableParts, [
 					'file_id' => $id,
 					'name' => $part->name,
