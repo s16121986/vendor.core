@@ -89,6 +89,14 @@ abstract class AbstractFile {
 	}
 
 	public function setData(array $data) {
+		foreach (['fullname', 'tmp_name', 'name'] as $k) {
+			if (!isset($data[$k]))
+				continue;
+
+			$this->$k = $data[$k];
+			unset($data[$k]);
+		}
+
 		foreach ($data as $k => $v) {
 			$this->$k = $v;
 		}
