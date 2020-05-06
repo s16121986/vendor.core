@@ -36,7 +36,6 @@ class AttributeFile extends AbstractAttribute {
 
 			$data = $data->getData();
 			$data['type'] = $this->type;
-			$data['parent_id'] = $this->hasModel() ? $this->model->id : null;
 			$file = new ApiFile($data);
 		}
 
@@ -100,7 +99,7 @@ class AttributeFile extends AbstractAttribute {
 	public function write() {
 		$value = $this->getValue();
 
-		if (!$value)
+		if (!$value || !$this->hasModel())
 			return false;
 
 		if (!is_array($value))
@@ -120,7 +119,7 @@ class AttributeFile extends AbstractAttribute {
 
 		if (!$this->multiple) {
 			foreach ($this->select() as $file) {
-				foreach (['id', 'parent_id', 'type', 'guid', 'index'] as $k) {
+				foreach (['id', 'type', 'index'] as $k) {
 					$files[0]->$k = $file->$k;
 				}
 
@@ -130,6 +129,7 @@ class AttributeFile extends AbstractAttribute {
 
 		foreach ($files as $file) {
 			$this->initPlugins($file);
+			$file->parent_id = $this->model->id;
 			$file->write();
 		}
 
