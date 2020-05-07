@@ -117,7 +117,7 @@ class AttributeFile extends AbstractAttribute {
 				$file->setContent($files[0]->getContents());
 				$this->initPlugins($file);
 				$file->write();
-
+				$this->value = $file;
 				return true;
 			}
 		}
