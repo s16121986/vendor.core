@@ -10,8 +10,6 @@ use Exception;
 
 class File extends BaseFile {
 
-	private static $table = 'files';
-	private static $tableParts = 'file_parts';
 	protected $parts = null;
 
 	private function setGuid($guid) {
@@ -22,7 +20,7 @@ class File extends BaseFile {
 	}
 
 	private function find($param, $value) {
-		$data = Db::from(self::$table)
+		$data = Db::from(Util::$table)
 				->where($param . '=?', $value)
 				->limit(1)
 				->query()
@@ -95,7 +93,7 @@ class File extends BaseFile {
 			$data[$key] = $this->$key;
 		}
 
-		$id = Db::write(self::$table, $data, $this->id);
+		$id = Db::write(Util::$table, $data, $this->id);
 		if (!$id)
 			return false;
 
@@ -137,10 +135,10 @@ class File extends BaseFile {
 				if ($part->exists())
 					$part->unlink();
 			}
-			Db::delete(self::$tableParts, 'file_id=' . $this->id);
+			Db::delete(Util::$tableParts, 'file_id=' . $this->id);
 		}
 
-		return Db::delete(self::$table, 'id=' . $this->id);
+		return Db::delete(Util::$table, 'id=' . $this->id);
 	}
 
 	public function reset() {

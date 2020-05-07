@@ -10,6 +10,8 @@ abstract class Util{
 	const NESTING_LEVEL = 3;
 	const DIRECTORY_NAME_LENGTH = 2;
 	
+	public static $table = 'files';
+	public static $tableParts = 'file_parts';
 	private static $config;
 
 	public static function setConfig($config) {
