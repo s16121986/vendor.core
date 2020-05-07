@@ -30,8 +30,7 @@ class File {
 			};
 			$this->data = $data;
 			$set('setDestination', 'destination', 'fullname', 'tmp_name');
-			$set('setName', 'name');
-			$set('setExtension', 'extension');
+			$set('setName', 'name', 'basename');
 		} else if ($data instanceof self) {
 			$this->data = $data->data;
 			$this->content = $data->content;
