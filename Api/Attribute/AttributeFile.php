@@ -107,11 +107,9 @@ class AttributeFile extends AbstractAttribute {
 
 		$files = [];
 		foreach ($value as $file) {
-			if ($file->isNew()) {
-				$files[] = $file;
-			} else {
-				$file->write();
-			}
+			if ($file->guid)
+				continue;
+			$files[] = $file;
 		}
 
 		if (empty($files))
@@ -122,7 +120,6 @@ class AttributeFile extends AbstractAttribute {
 				foreach (['id', 'type', 'index'] as $k) {
 					$files[0]->$k = $file->$k;
 				}
-
 				break;
 			}
 		}
