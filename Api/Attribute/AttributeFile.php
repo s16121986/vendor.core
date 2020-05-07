@@ -114,7 +114,7 @@ class AttributeFile extends AbstractAttribute {
 		if (!$this->multiple) {
 			foreach ($this->select() as $file) {
 				$file->setName($files[0]->name);
-				$file->setContent($files[0]->getContent());
+				$file->setContent($files[0]->getContents());
 				$this->initPlugins($file);
 				$file->write();
 
