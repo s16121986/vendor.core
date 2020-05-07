@@ -2,10 +2,10 @@
 
 namespace Api;
 
+use Api\File\Util;
 use Db;
 use File as BaseFile;
 use File\Part as FilePart;
-use File\Util;
 use Exception;
 
 class File extends BaseFile {
@@ -33,14 +33,14 @@ class File extends BaseFile {
 
 		$this->data = $data;
 		$this->setGuid($data['guid']);
-		
+
 		return true;
 	}
-	
+
 	public function findById($id) {
 		return $this->find('id', $id);
 	}
-	
+
 	public function findByGuid($guid) {
 		return $this->find('guid', $guid);
 	}
@@ -51,11 +51,11 @@ class File extends BaseFile {
 
 		return parent::setDestination($destination);
 	}
-	
+
 	public function setParent($id, $type = null) {
 		return $this
-				->set('parent_id', $id)
-				->set('type', $type);
+						->set('parent_id', $id)
+						->set('type', $type);
 	}
 
 	public function isNew() {
