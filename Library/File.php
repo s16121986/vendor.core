@@ -20,7 +20,7 @@ class File {
 			$self = $this;
 			$set = function () use ($self, $data) {
 				$args = func_get_args();
-				$fn = array_pop($args);
+				$fn = array_shift($args);
 				foreach ($args as $n) {
 					if (!isset($data[$n]))
 						continue;

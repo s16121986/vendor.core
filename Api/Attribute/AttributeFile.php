@@ -31,18 +31,14 @@ class AttributeFile extends AbstractAttribute {
 			$file = new ApiFile();
 			if (!$file->findByGuid($data))
 				return null;
+			return $file;
 		} elseif ($data instanceof BaseFile) {
 			if (!$data->hasContent())
 				return null;
-			
-			$file = new ApiFile($data->getData());
+
+			return new ApiFile($data->getData());
 		} else
 			return null;
-
-		if (!parent::checkValue($file))
-			return null;
-
-		return $file;
 	}
 
 	protected function hasModel() {
@@ -77,22 +73,22 @@ class AttributeFile extends AbstractAttribute {
 	}
 
 	public function prepareValue($value) {
-		if ($this->multiple) {
-			$valueTemp = $value;
-			$value = [];
-			if (is_string($valueTemp))
-				$valueTemp = [$valueTemp];
+		if (!$this->multiple)
+			return $this->fileFactory($value);
 
-			if (is_array($valueTemp)) {
-				foreach ($valueTemp as $data) {
-					if (($file = $this->fileFactory($data))) {
-						$value[] = $file;
-					}
-				}
+		$valueTemp = $value;
+		$value = [];
+		if (is_string($valueTemp))
+			$valueTemp = [$valueTemp];
+		else if (!is_array($valueTemp))
+			return [];
+
+		foreach ($valueTemp as $data) {
+			if (($file = $this->fileFactory($data))) {
+				$value[] = $file;
 			}
-		} else {
-			$value = $this->fileFactory($value);
 		}
+
 		return $value;
 	}
 
@@ -121,7 +117,7 @@ class AttributeFile extends AbstractAttribute {
 				$file->setContent($files[0]->getContent());
 				$this->initPlugins($file);
 				$file->write();
-				
+
 				return true;
 			}
 		}
