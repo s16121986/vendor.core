@@ -99,7 +99,7 @@ class File extends BaseFile {
 
 		$this
 				->set('id', $id)
-				->setGuid('guid', $guid);
+				->setGuid($guid);
 
 		Util::checkPath($guid);
 
