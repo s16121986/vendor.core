@@ -2,7 +2,6 @@
 namespace Http\Content;
 
 use File;
-use File\AbstractFile;
 use Exception;
 
 abstract class Factory{
@@ -25,7 +24,7 @@ abstract class Factory{
 	public static function fromFile($file) {
 		if (is_string($file))
 			$file = new File($file);
-		if (!($file instanceof AbstractFile)) {
+		if (!($file instanceof File)) {
 			throw new Exception('File format invalid');
 		}
 		if (!$file->exists()) {

@@ -1,13 +1,13 @@
 <?php
 namespace Http\Content;
 
-use File\AbstractFile;
+use File;
 
 class File extends AbstractContent{
 	
 	protected $file;
 	
-	public function __construct(AbstractFile $file) {
+	public function __construct(File $file) {
 		$this->file = $file;
 		parent::__construct();
 	}

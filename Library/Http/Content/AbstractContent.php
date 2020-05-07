@@ -2,7 +2,7 @@
 namespace Http\Content;
 
 use Http\Util as HttpUtil;
-use File\AbstractFile;
+use File;
 
 abstract class AbstractContent{
 	
@@ -101,7 +101,7 @@ abstract class AbstractContent{
 				return $this;
 			}
 			$this->content[$file] = file_get_contents($this->includePath . $file);
-		} elseif ($file instanceof AbstractFile) {
+		} elseif ($file instanceof File) {
 			$this->addContent($file->getData());
 		}
 		return $this;

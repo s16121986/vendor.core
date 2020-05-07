@@ -2,7 +2,7 @@
 
 namespace Api\Attribute;
 
-use File\AbstractFile as BaseFile;
+use File as BaseFile;
 use Api\File as ApiFile;
 use Db;
 
@@ -27,22 +27,22 @@ class AttributeFile extends AbstractAttribute {
 	}
 
 	protected function fileFactory($data) {
-		$file = null;
 		if (is_string($data)) {
-			$file = ApiFile::getByGuid($data);
+			$file = new ApiFile();
+			if (!$file->findByGuid($data))
+				return null;
 		} elseif ($data instanceof BaseFile) {
 			if (!$data->hasContent())
 				return null;
+			
+			$file = new ApiFile($data->getData());
+		} else
+			return null;
 
-			$data = $data->getData();
-			$data['type'] = $this->type;
-			$file = new ApiFile($data);
-		}
+		if (!parent::checkValue($file))
+			return null;
 
-		if ($file && parent::checkValue($file))
-			return $file;
-
-		return null;
+		return $file;
 	}
 
 	protected function hasModel() {
@@ -117,16 +117,18 @@ class AttributeFile extends AbstractAttribute {
 
 		if (!$this->multiple) {
 			foreach ($this->select() as $file) {
-				foreach (['id', 'type', 'index'] as $k) {
-					$files[0]->$k = $file->$k;
-				}
-				break;
+				$file->setName($files[0]->name);
+				$file->setContent($files[0]->getContent());
+				$this->initPlugins($file);
+				$file->write();
+				
+				return true;
 			}
 		}
 
 		foreach ($files as $file) {
 			$this->initPlugins($file);
-			$file->parent_id = $this->model->id;
+			$file->setParent($this->model->id, $this->type);
 			$file->write();
 		}
 
