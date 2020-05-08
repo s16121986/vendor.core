@@ -81,9 +81,10 @@ class File extends BaseFile {
 		$data['created'] = 'CURRENT_TIMESTAMP';
 
 		if ($isNew) {
-			$data['index'] = Db::from('files', 'MAX(`index`)')
+			if ($this->parent_id)
+				$data['index'] = Db::from('files', 'MAX(`index`)')
 							->where('parent_id=' . $this->parent_id)
-							->where('type=' . $this->type)
+							->where('type=?', $this->type)
 							->query()->fetchColumn() + 1;
 		} else {
 			$data['index'] = $this->index ?: 0;
