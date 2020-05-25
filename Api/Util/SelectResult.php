@@ -41,7 +41,7 @@ class SelectResult extends Collection {
 	}
 	
 	protected function getItemId($item) {
-		return $item->id;
+		return $item->uuid();
 	}
 
 }
