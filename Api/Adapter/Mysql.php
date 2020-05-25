@@ -189,7 +189,7 @@ class Mysql extends AbstractAdapter{
 				case \ComparisonType::NotContains:
 					$value = self::foramtValue($attribute, $value);
 					if (is_string($value) && $value) {
-						$value = '%' . $value . '%';
+						//$value = '%' . $value . '%';
 						$condition = $condition . ' (?)';
 					} else {
 						$condition = null;

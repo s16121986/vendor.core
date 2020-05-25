@@ -210,7 +210,7 @@ class Param{
 					if (!is_string($value) || !$value)
 						return null;
 					
-					$value = '%' . $value . '%';
+					//$value = '%' . $value . '%';
 					return $this->condition($condition . ' (?)', $value);
 					
 				case \ComparisonType::IntervalIncludingBounds:
