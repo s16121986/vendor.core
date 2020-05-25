@@ -103,7 +103,7 @@ class Param{
 	public function __set($name, $value) {
 		if (isset(self::$paramsAssoc[$name]))
 			$name = self::$paramsAssoc[$name];
-		$this->params[$name] = $value;
+		$this->_set($name, $value);
 	}
 
 	public function isEmpty() {
@@ -251,6 +251,10 @@ class Param{
 			$sqlValue = Db::quote($value);
 		
 		return $this->identifier . ' ' . str_replace('?', $sqlValue, $condition);
+	}
+	
+	protected function _set($name, $value) {
+		$this->params[$name] = $value;
 	}
 
 	protected function _setValue($name, $value) {
