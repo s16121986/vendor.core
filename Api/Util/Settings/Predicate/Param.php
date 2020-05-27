@@ -56,6 +56,8 @@ class Param{
 			return null;
 		
 		switch ($valueType) {
+			case 'date':
+				return DateTime::serverDate($value);
 			case 'datetime':
 				if (in_array($comparisonType, [\ComparisonType::Less, \ComparisonType::LessOrEqual]))
 					return DateTime::serverDate($value) . ' 23:59:59';
