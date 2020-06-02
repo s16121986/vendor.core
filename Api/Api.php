@@ -297,6 +297,10 @@ abstract class Api extends Api\Util\BaseApi {
 		return true;
 	}
 
+	public function deleteForced() {
+		return DeleteTransaction::init($this, true);
+	}
+
 	public function empty() {
 		return new SelectResult();
 	}
