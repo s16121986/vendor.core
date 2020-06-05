@@ -36,8 +36,6 @@ abstract class AbstractAttribute{
 		$this->qualifiers = array_merge(self::$defaultParams, $this->qualifiers);
 		if ($qualifiers)
 			$this->setQualifiers($qualifiers);
-		if ($this->primary)
-			$this->qualifiers['required'] = true;
 	}
 
 	public function __get($name) {
