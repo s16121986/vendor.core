@@ -43,9 +43,9 @@ abstract class Api extends Api\Util\BaseApi {
 
 	public function __set($name, $value) {
 
-		$setMethod = 'set' . $name;
-		if (method_exists($this, $setMethod))
-			return $this->$setMethod($value);
+		//$setMethod = 'set' . $name;
+		//if (method_exists($this, $setMethod))
+		//	return $this->$setMethod($value);
 
 		if (isset($this->tabularSections[$name])) {
 			$this->tabularSections[$name]->set($value);
