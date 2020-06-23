@@ -25,6 +25,7 @@ class Db{
     const FETCH_SERIALIZE = 524288;
     const FETCH_UNIQUE = 196608;
 	
+	public static $shutdownDisctonnect = true;
 	private static $adapter;
 	
 	public static function setConfig($config) {
@@ -34,6 +35,8 @@ class Db{
 	public static function init($connectionInfo) {
 		self::$adapter = new Adapter($connectionInfo);
 		register_shutdown_function(function() {
+			if (!Db::$shutdownDisctonnect)
+				return;
 			Db::getAdapter()->disconnect();
 		});
 		return self::$adapter;
