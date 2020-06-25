@@ -157,7 +157,7 @@ abstract class AbstractAdapter{
 		if (isset($options['fields']) && is_array($options['fields'])) {
 			$fileds = $options['fields'];
 		}*/
-		$language = Translation::getLanguage();		
+		$language = Translation::getLanguage() ?: Translation::getDefault();
 		if ($language) {
 			foreach ($this->_api->getAttributes() as $attribute) {
 				if (!$attribute->locale)
