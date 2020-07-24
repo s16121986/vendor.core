@@ -18,7 +18,7 @@ class Mysqli {
 	 *
 	 * @var array
 	 */
-	protected $connectionParameters = array();
+	protected $connectionParameters = [];
 
 	/**
 	 * @var \mysqli
@@ -91,9 +91,8 @@ class Mysqli {
 	 * @return Connection
 	 */
 	public function connect() {
-		if ($this->isConnected()) {
+		if ($this->isConnected())
 			return $this;
-		}
 
 		// localize
 		$p = $this->connectionParameters;
@@ -108,19 +107,17 @@ class Mysqli {
 			return;
 		};
 
-		$hostname = $findParameterValue(array('hostname', 'host'));
-		$username = $findParameterValue(array('username', 'user'));
-		$password = $findParameterValue(array('password', 'passwd', 'pw'));
-		$database = $findParameterValue(array('database', 'dbname', 'db', 'schema'));
+		$hostname = $findParameterValue(['hostname', 'host']);
+		$username = $findParameterValue(['username', 'user']);
+		$password = $findParameterValue(['password', 'passwd', 'pw']);
+		$database = $findParameterValue(['database', 'dbname', 'db', 'schema']);
 		$port = (isset($p['port'])) ? (int) $p['port'] : null;
 		$socket = (isset($p['socket'])) ? $p['socket'] : null;
-		if (false !== $findParameterValue(array('permanent'))) {
+		if (false !== $findParameterValue(['permanent']))
 			$hostname = 'p:' . $hostname;
-		}
 
 		$this->resource = new \mysqli();
 		$this->resource->init();
-
 		$this->resource->options(MYSQLI_OPT_CONNECT_TIMEOUT, 5);
 
 		if (!empty($p['driver_options'])) {
@@ -137,11 +134,10 @@ class Mysqli {
 		}
 
 		$flag = $this->resource->real_connect($hostname, $username, $password, $database, $port, $socket);
-		if (!$flag || $this->resource->connect_error) {
+		if (!$flag || $this->resource->connect_error)
 			throw new Exception\RuntimeException(
 					'Connection error', null, new Exception\ErrorException($this->resource->connect_error, $this->resource->connect_errno)
 			);
-		}
 
 		if (isset($p['charset']) && !empty($p['charset']))
 			$this->resource->set_charset($p['charset']);
