@@ -143,7 +143,7 @@ class Mysqli {
 			);
 		}
 
-		if (isset($p['charset']) ?? !empty($p['charset']))
+		if (isset($p['charset']) && !empty($p['charset']))
 			$this->resource->set_charset($p['charset']);
 
 		if (isset($p['timezone']))
