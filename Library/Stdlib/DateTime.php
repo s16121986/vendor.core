@@ -18,8 +18,8 @@ class DateTime extends BaseDateTime {
 		Format::init();
 	}
 
-	public static function factory($date, $timezone = 'client') {
-		$factoryDate = new self('now', null);
+	public static function factory($date, $timezone = null) {
+		$factoryDate = new self('now', DateTimezone::getServer());
 
 		if ($date instanceof self) {
 			$factoryDate->setTimezone($date->getTimezone());
@@ -32,8 +32,7 @@ class DateTime extends BaseDateTime {
 			$factoryDate->setTimestamp(strtotime($date));
 		}
 
-		if ($timezone)
-			$factoryDate->setTimezone($timezone);
+		$factoryDate->setTimezone($timezone);
 
 		return $factoryDate;
 	}
@@ -65,11 +64,9 @@ class DateTime extends BaseDateTime {
 		return self::factory($datetime, DateTimezone::getServer())->format('server.datetime');
 	}
 
-	public function __construct($time = 'now', BaseDateTimeZone $timezone = 'client') {
-		parent::__construct($time, $timezone);
-
-		if ($timezone)
-			$this->setTimezone($timezone);
+	public function __construct($time = 'now', BaseDateTimeZone $timezone = null) {
+		parent::__construct($time);
+		$this->setTimezone($timezone);
 	}
 
 	public function format($format) {
@@ -88,8 +85,13 @@ class DateTime extends BaseDateTime {
 	}
 
 	public function setTimezone(BaseDateTimeZone $timezone) {
+		if (null === $timezone)
+			$timezone = DateTimeZone::getClient();
 		if (is_string($timezone) && DateTimeZone::get($timezone))
 			$timezone = DateTimeZone::get($timezone);
+
+		if (!$timezone)
+			return $this;
 
 		return parent::setTimezone($timezone);
 	}
