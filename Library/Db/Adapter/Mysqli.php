@@ -120,7 +120,7 @@ class Mysqli {
 
 		$this->resource = new \mysqli();
 		$this->resource->init();
-		
+
 		$this->resource->options(MYSQLI_OPT_CONNECT_TIMEOUT, 5);
 
 		if (!empty($p['driver_options'])) {
@@ -139,13 +139,15 @@ class Mysqli {
 		$flag = $this->resource->real_connect($hostname, $username, $password, $database, $port, $socket);
 		if (!$flag || $this->resource->connect_error) {
 			throw new Exception\RuntimeException(
-			'Connection error', null, new Exception\ErrorException($this->resource->connect_error, $this->resource->connect_errno)
+					'Connection error', null, new Exception\ErrorException($this->resource->connect_error, $this->resource->connect_errno)
 			);
 		}
 
-		if (!empty($p['charset'])) {
+		if (isset($p['charset']) ?? !empty($p['charset']))
 			$this->resource->set_charset($p['charset']);
-		}
+
+		if (isset($p['timezone']))
+			$this->resource->query('SET time_zone="' . $p['timezone'] . '"'); //SET time_zone = '-05:00';
 
 		return $this;
 	}
@@ -336,9 +338,9 @@ class Mysqli {
 			$where['id'] = $id;
 		}
 		$sql = 'UPDATE `' . $table . '` SET ' . join(',', $array) . $this->getWhereQuery($where);
-		
+
 		$this->query($sql);
-		
+
 		if ($this->resource->affected_rows > -1) {
 			return isset($where['id']) ? $where['id'] : true;
 		}
@@ -358,8 +360,8 @@ class Mysqli {
 			return null === $value ? 'NULL' : '\'' . $this->resource->real_escape_string($value) . '\'';
 		}
 		trigger_error(
-			'Attempting to quote a value in ' . __CLASS__ . ' without extension/driver support '
-			. 'can introduce security vulnerabilities in a production environment.'
+				'Attempting to quote a value in ' . __CLASS__ . ' without extension/driver support '
+				. 'can introduce security vulnerabilities in a production environment.'
 		);
 		return null === $value ? 'NULL' : '\'' . addcslashes($value, "\x00\n\r\\'\"\x1a") . '\'';
 	}
@@ -387,15 +389,15 @@ class Mysqli {
 			case is_bool($value):
 				return $value ? 1 : 0;
 			case is_float($value):
-				return str_replace(',', '.', (string)$value);
+				return str_replace(',', '.', (string) $value);
 			case is_scalar($value):
 				return $this->quoteValue($value);
 			case null === $value:
 				return 'NULL';
 			case $value instanceof Db\Expr:
-				return (string)$value;
+				return (string) $value;
 			case $value instanceof \DateTime:
-				
+
 				break;
 		}
 		return null;
@@ -480,7 +482,7 @@ class Mysqli {
 		if (is_string($where) && !preg_match('/^\d+$/', $where)) {
 			return ' WHERE ' . $where;
 		} elseif (!is_array($where)) {
-			$where = array('id' => (int)$where);
+			$where = array('id' => (int) $where);
 		}
 		$array = array();
 		foreach ($this->getValuesArray($where) as $k => $v) {
