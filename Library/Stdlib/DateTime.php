@@ -84,7 +84,7 @@ class DateTime extends BaseDateTime {
 		return parent::format($format);
 	}
 
-	public function setTimezone(BaseDateTimeZone $timezone) {
+	public function setTimezone($timezone) {
 		if (null === $timezone)
 			$timezone = DateTimeZone::getClient();
 		if (is_string($timezone) && DateTimeZone::get($timezone))
