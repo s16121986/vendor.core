@@ -1,4 +1,5 @@
 <?php
+
 namespace Api\Adapter;
 
 use Db;
@@ -8,10 +9,9 @@ use Api\Util\BaseApi;
 use Api\Util\Settings\Collection\Filter as FilterItem;
 use Api\Attribute\AttributeFile;
 
-abstract class AbstractAdapter{
+abstract class AbstractAdapter {
 
 	protected $_api = null;
-
 	protected $_query = null;
 
 	public function __construct(BaseApi $api) {
@@ -32,7 +32,7 @@ abstract class AbstractAdapter{
 		}
 		return false;
 	}
-	
+
 	protected function getColumnExpression($column) {
 		if ($column->expression)
 			return $column->expression;
@@ -40,7 +40,7 @@ abstract class AbstractAdapter{
 		$alias = $column->alias ?: $name;
 		return $name . ' as ' . $alias;
 	}
-	
+
 	protected function getAttributeColumn($attribute) {
 		if ($attribute->hidden)
 			return null;
@@ -92,25 +92,31 @@ abstract class AbstractAdapter{
 				$this->filter($item);
 			}
 		}
-		
+
 		foreach ($settings->predicates as $predicate) {
 			$ps = $predicate->getSqlString();
 			if (!$ps)
 				continue;
 			$this->where($ps);
 		}
-		
+
 		if ($settings->quicksearch->isEnabled()) {
 			$or = array();
 			foreach ($settings->quicksearch->getValues() as $value) {
 				switch ($settings->quicksearch->getBounds()) {
-					case 'left':$boundValue = '%' . $value;break;
-					case 'right':$boundValue = $value . '%';break;
-					case 'both':$boundValue = '%' . $value . '%';break;
+					case 'left':$boundValue = '%' . $value;
+						break;
+					case 'right':$boundValue = $value . '%';
+						break;
+					case 'both':$boundValue = '%' . $value . '%';
+						break;
 				}
 				$quotedValue = Db::quote($boundValue);
 				foreach ($settings->quicksearch->getColumns() as $column) {
-					if (($attribute = $this->_api->getAttribute($column))) {
+					if ($column instanceof Expr) {
+						$or[] = str_replace('?', $quotedValue, (string) $column);
+						continue;
+					} else if (($attribute = $this->_api->getAttribute($column))) {
 						$table = $this->_api->table . '.`' . Translation::getColumn($attribute);
 						switch ($attribute->getType()) {
 							case \AttributeType::Boolean:
@@ -120,7 +126,7 @@ abstract class AbstractAdapter{
 							case \AttributeType::Number:
 							case \AttributeType::Year:
 								if (is_numeric($value)) {
-									$or[] = $table . '`=' . (int)$value;
+									$or[] = $table . '`=' . (int) $value;
 								}
 								continue 2;
 						}
@@ -153,10 +159,10 @@ abstract class AbstractAdapter{
 	}
 
 	protected function initJoins($settings, $columns = true) {
-		/*$fileds = null;
-		if (isset($options['fields']) && is_array($options['fields'])) {
-			$fileds = $options['fields'];
-		}*/
+		/* $fileds = null;
+		  if (isset($options['fields']) && is_array($options['fields'])) {
+		  $fileds = $options['fields'];
+		  } */
 		$language = Translation::getLanguage() ?: Translation::getDefault();
 		if ($language) {
 			foreach ($this->_api->getAttributes() as $attribute) {
@@ -169,7 +175,7 @@ abstract class AbstractAdapter{
 				break;
 			}
 		}
-		
+
 		foreach ($settings->joins as $join) {
 			if ($columns) {
 				$cols = array();
@@ -185,8 +191,10 @@ abstract class AbstractAdapter{
 				$cols = null;
 			}
 			switch ($join->type) {
-				case 'inner':$this->joinInner($join->getTableName(), $join->condition, $cols);break;
-				case 'right':$this->joinRight($join->getTableName(), $join->condition, $cols);break;
+				case 'inner':$this->joinInner($join->getTableName(), $join->condition, $cols);
+					break;
+				case 'right':$this->joinRight($join->getTableName(), $join->condition, $cols);
+					break;
 				//case 'outer':$this->joinOuter($join->name . ' as ' . $join->alias, $join->condition, $cols);break;
 				default:
 					$this->joinLeft($join->getTableName(), $join->condition, $cols);
@@ -199,7 +207,7 @@ abstract class AbstractAdapter{
 		$order = array();
 		foreach ($settings->order->get() as $item) {
 			switch (true) {
-				case (bool)$item->expression:
+				case (bool) $item->expression:
 					$order[] = $item->expression;
 					break;
 				case (!$item->name):break;
@@ -210,13 +218,13 @@ abstract class AbstractAdapter{
 				case $item->name === 'random':
 					$order[] = 'RAND()';
 					break;
-				case (bool)($table = $this->getColumnTable($settings, $item->name, true)):
-					$order[] = $table . ' ' .$item->direction;
+				case (bool) ($table = $this->getColumnTable($settings, $item->name, true)):
+					$order[] = $table . ' ' . $item->direction;
 					break;
 				default:
 					foreach ($settings->columns->get() as $column) {
 						if ($item->name === $column->alias) {
-							$order[] = $column->alias . ' ' .$item->direction;
+							$order[] = $column->alias . ' ' . $item->direction;
 							break;
 						}
 					}
@@ -262,7 +270,8 @@ abstract class AbstractAdapter{
 			}
 			$gb = array();
 			foreach ($flds as $g) {
-				if (isset($attributes[$g])) $gb[] = $g;
+				if (isset($attributes[$g]))
+					$gb[] = $g;
 			}
 			if (!empty($gb)) {
 				$this->group($gb);
@@ -300,7 +309,7 @@ abstract class AbstractAdapter{
 		$this->_query = null;
 		return $this;
 	}
-	
+
 	protected function formatData($data) {
 		if (isset($data['id']))
 			$data['id'] = +$data['id'];
@@ -309,17 +318,17 @@ abstract class AbstractAdapter{
 				continue;
 			switch ($attribute->getType()) {
 				case 'boolean':
-					$data[$attribute->name] = (bool)$data[$attribute->name];
+					$data[$attribute->name] = (bool) $data[$attribute->name];
 					break;
 				case 'model':
 				case 'year':
-					$data[$attribute->name] = (int)$data[$attribute->name];
+					$data[$attribute->name] = (int) $data[$attribute->name];
 					break;
 				case 'enum':
-					$data[$attribute->name] = is_numeric($data[$attribute->name]) ? (int)$data[$attribute->name] : $data[$attribute->name];
+					$data[$attribute->name] = is_numeric($data[$attribute->name]) ? (int) $data[$attribute->name] : $data[$attribute->name];
 					break;
 				case 'number':
-					$data[$attribute->name] = $attribute->fractionDigits ? (float)$data[$attribute->name] : (int)$data[$attribute->name];
+					$data[$attribute->name] = $attribute->fractionDigits ? (float) $data[$attribute->name] : (int) $data[$attribute->name];
 					break;
 			}
 		}
@@ -343,5 +352,4 @@ abstract class AbstractAdapter{
 	abstract public function group($group);
 
 	abstract public function query($query);
-
 }
