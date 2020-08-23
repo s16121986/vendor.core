@@ -9,11 +9,12 @@ class Url extends AbstractUrl{
 	protected $homePath = '/';
 	
 	protected function init() {
-		$this->setAlias('home', $this->getHome());
 		parent::init();
 	}
 	
 	public function parse($uri) {
+		if ($uri === 'home')
+			$uri = $this->getHome();
 		parent::parse($uri);
 		$this->path = str_replace($this->homePath, '/', $this->path);
 		return $this;
