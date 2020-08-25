@@ -14,27 +14,7 @@ class File {
 		if (null === $data)
 			return;
 
-		if (is_string($data))
-			$this->setDestination($data);
-		else if (is_array($data)) {
-			$self = $this;
-			$set = function () use ($self, $data) {
-				$args = func_get_args();
-				$fn = array_shift($args);
-				foreach ($args as $n) {
-					if (!isset($data[$n]))
-						continue;
-					$self->$fn($data[$n]);
-					break;
-				}
-			};
-			$this->data = $data;
-			$set('setDestination', 'destination', 'fullname', 'tmp_name');
-			$set('setName', 'name', 'basename');
-		} else if ($data instanceof self) {
-			$this->data = $data->data;
-			$this->content = $data->content;
-		}
+		$this->setData($data);
 	}
 
 	public function __get($name) {
@@ -90,6 +70,30 @@ class File {
 		return $this
 						->set('filename', $info['filename'])
 						->set('name', $info['basename']);
+	}
+
+	public function setData($data) {
+		if (is_string($data))
+			$this->setDestination($data);
+		else if (is_array($data)) {
+			$set = function () use ($data) {
+				$args = func_get_args();
+				$fn = array_shift($args);
+				foreach ($args as $n) {
+					if (!isset($data[$n]))
+						continue;
+					$this->$fn($data[$n]);
+					break;
+				}
+			};
+			$set->bindTo($this);
+			$this->data = $data;
+			$set('setDestination', 'destination', 'fullname', 'tmp_name');
+			$set('setName', 'name', 'basename');
+		} else if ($data instanceof self) {
+			$this->data = $data->data;
+			$this->content = $data->content;
+		}
 	}
 
 	public function getData() {
@@ -164,7 +168,7 @@ class File {
 	}
 
 	public function __toString() {
-		return (string)$this->name;
+		return (string) $this->name;
 	}
 
 }
