@@ -1,16 +1,19 @@
 <?php
+
 namespace Grid\Column;
 
-class File extends AbstractColumn{
+use Api\File\Util as FileUtil;
 
-	protected $_options = array(
+class File extends AbstractColumn {
 
-	);
+	protected $_options = [
+		'hrefTarget' => '_blank'
+	];
 
 	public function formatValue($value, $row = null) {
-		if ($value) {
-			return '<a href="/file/' . $value . '/" target="_blank">скачать</a>';
-		}
+		if ($value)
+			return '<a href="' . FileUtil::getHttpUrl($value) . '" target="_blank">скачать</a>';
 		return '';
 	}
+
 }

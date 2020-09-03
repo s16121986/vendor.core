@@ -1,21 +1,27 @@
 <?php
+
 namespace Api\File;
 
 use Api\File as ApiFile;
 use Db;
 use Exception;
 
-abstract class Util{
+abstract class Util {
 
 	const NESTING_LEVEL = 3;
 	const DIRECTORY_NAME_LENGTH = 2;
-	
+
 	public static $table = 'files';
 	public static $tableParts = 'file_parts';
 	private static $config;
+	private static $httpUrlTpl = '/file/%guid%/';
 
 	public static function setConfig($config) {
 		self::$config = $config;
+	}
+	
+	public static function setHttpUrlTemplate($tpl) {
+		self::$httpUrlTpl = $tpl;
 	}
 
 	public static function config($name, $default = null) {
@@ -93,7 +99,7 @@ abstract class Util{
 
 		return $fullPath ? FILES_PATH . $path : $path;
 	}
-	
+
 	public static function getDestination($guid, $fullPath = true) {
 		return self::getPath($guid, $fullPath) . $guid;
 	}
@@ -130,4 +136,9 @@ abstract class Util{
 		return true;
 	}
 	
+	public static function getHttpUrl($file) {
+		$tpl = self::$httpUrlTpl;
+		return str_replace('%guid%', (string)$file ?? 'empty', $tpl);
+	}
+
 }

@@ -83,9 +83,9 @@ class File extends BaseFile {
 		if ($isNew) {
 			if ($this->parent_id)
 				$data['index'] = Db::from('files', 'MAX(`index`)')
-							->where('parent_id=' . $this->parent_id)
-							->where('type=?', $this->type)
-							->query()->fetchColumn() + 1;
+								->where('parent_id=' . $this->parent_id)
+								->where('type=?', $this->type)
+								->query()->fetchColumn() + 1;
 		} else {
 			$data['index'] = $this->index ?: 0;
 		}
@@ -147,10 +147,6 @@ class File extends BaseFile {
 		return parent::reset();
 	}
 
-	public function __toString() {
-		return $this->guid;
-	}
-
 	public function getParts() {
 		if (!$this->id)
 			return [];
@@ -189,6 +185,10 @@ class File extends BaseFile {
 	public function getPart($index) {
 		$this->getParts();
 		return (isset($this->parts[$index]) ? $this->parts[$index] : null);
+	}
+
+	public function __toString() {
+		return $this->guid;
 	}
 
 }
