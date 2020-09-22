@@ -4,6 +4,7 @@ namespace Api\Attribute;
 
 use File as BaseFile;
 use Api\File as ApiFile;
+use Api\File\Util as FileUtil;
 use Db;
 
 class AttributeFile extends AbstractAttribute {
@@ -32,7 +33,7 @@ class AttributeFile extends AbstractAttribute {
 			if (!$file->findByGuid($data))
 				return null;
 			return $file;
-		} elseif ($data instanceof BaseFile) {
+		} else if ($data instanceof BaseFile) {
 			if (!$data->hasContent())
 				return null;
 
@@ -137,10 +138,10 @@ class AttributeFile extends AbstractAttribute {
 
 		$files = [];
 
-		$q = Db::from('files')
-				->order('index')
-				->where('parent_id=' . $this->model->id . ' AND type=' . $this->type)
-				->query();
+		$q = Db::from(FileUtil::config('table'))
+			->order('index')
+			->where('parent_id=' . $this->model->id . ' AND type=' . $this->type)
+			->query();
 
 		while ($r = $q->fetch()) {
 			$files[] = new ApiFile($r);

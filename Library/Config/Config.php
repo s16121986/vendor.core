@@ -29,6 +29,10 @@ class Config{
 	public function get($name, $default = null) {
 		return isset($this->data[$name]) ? $this->data[$name] : $default;
 	}
+
+	public function asArray() {
+		return $this->data;
+	}
 	
 	public function isEmpty() {
 		return empty($this->data);

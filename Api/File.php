@@ -14,17 +14,17 @@ class File extends BaseFile {
 
 	private function setGuid($guid) {
 		return $this
-						->set('guid', $guid)
-						->set('fullname', Util::getDestination($guid, true))
-						->set('path', Util::getPath($guid, true));
+			->set('guid', $guid)
+			->set('fullname', Util::getDestination($guid, true))
+			->set('path', Util::getPath($guid, true));
 	}
 
 	private function find($param, $value) {
 		$data = Db::from(Util::$table)
-				->where($param . '=?', $value)
-				->limit(1)
-				->query()
-				->fetchRow();
+			->where($param . '=?', $value)
+			->limit(1)
+			->query()
+			->fetchRow();
 
 		if (!$data)
 			return false;
@@ -52,8 +52,8 @@ class File extends BaseFile {
 
 	public function setParent($id, $type = null) {
 		return $this
-						->set('parent_id', $id)
-						->set('type', $type);
+			->set('parent_id', $id)
+			->set('type', $type);
 	}
 
 	public function isNew() {
@@ -82,10 +82,10 @@ class File extends BaseFile {
 
 		if ($isNew) {
 			if ($this->parent_id)
-				$data['index'] = Db::from('files', 'MAX(`index`)')
-								->where('parent_id=' . $this->parent_id)
-								->where('type=?', $this->type)
-								->query()->fetchColumn() + 1;
+				$data['index'] = Db::from(Util::config('table'), 'MAX(`index`)')
+						->where('parent_id=' . $this->parent_id)
+						->where('type=?', $this->type)
+						->query()->fetchColumn() + 1;
 		} else {
 			$data['index'] = $this->index ?: 0;
 		}
@@ -99,8 +99,8 @@ class File extends BaseFile {
 			return false;
 
 		$this
-				->set('id', $id)
-				->setGuid($guid);
+			->set('id', $id)
+			->setGuid($guid);
 
 		Util::checkPath($guid);
 
@@ -157,8 +157,8 @@ class File extends BaseFile {
 		$this->parts = [];
 
 		$q = Db::from(self::$tableParts, ['index'])
-				->where('file_id=?', $this->id)
-				->query();
+			->where('file_id=?', $this->id)
+			->query();
 		while ($r = $q->fetch()) {
 			$part = new FilePart($this, $r);
 			$part->init();

@@ -4,6 +4,7 @@ namespace Api\Adapter;
 
 use Db;
 use Db\Expr as Expr;
+use Api\File\Util as FileUtil;
 use Api\Util\Translation;
 use Api\Util\BaseApi;
 use Api\Util\Settings\Collection\Filter as FilterItem;
@@ -53,14 +54,16 @@ abstract class AbstractAdapter {
 			if (true === $name || !$name)
 				$name = $attribute->name;
 			$alias = $name;
+			$t = FileUtil::config('table');
 			if ($attribute->fieldName) {
-				return new Expr('(SELECT guid FROM files WHERE `files`.id=`' . $this->_api->table . '`.`' . $attribute->name . '` LIMIT 1) as `' . $alias . '`');
+				return new Expr('(SELECT guid FROM ' . $t . ' as t WHERE t.id=`' . $this->_api->table . '`.`' . $attribute->name . '` LIMIT 1) as `' . $alias . '`');
 			} else {
-				return new Expr('(SELECT guid FROM files
-					WHERE `files`.parent_id=`' . $this->_api->table . '`.id
-						AND files.`type`=' . $attribute->type . ' ORDER BY `index` LIMIT 1) as `' . $alias . '`');
+				return new Expr('(SELECT guid FROM ' . $t . ' as t
+					WHERE t.parent_id=`' . $this->_api->table . '`.id
+						AND t.`type`=' . $attribute->type
+					. ' ORDER BY `index` LIMIT 1) as `' . $alias . '`');
 			}
-		} elseif ($attribute->locale) {
+		} else if ($attribute->locale) {
 			return new Expr('`' . Translation::getTable($this->_api) . '`.`' . $attribute->name . '` as `' . $attribute->name . '`');
 		} else {
 			$name = $attribute->name;
@@ -69,7 +72,7 @@ abstract class AbstractAdapter {
 	}
 
 	protected function initColumns($settings) {
-		$columns = array();
+		$columns = [];
 		foreach ($this->_api->getAttributes() as $attribute) {
 			if ($settings->columns->hasName($attribute->name)) {
 				if (($expression = $this->getAttributeColumn($attribute))) {
@@ -101,20 +104,23 @@ abstract class AbstractAdapter {
 		}
 
 		if ($settings->quicksearch->isEnabled()) {
-			$or = array();
+			$or = [];
 			foreach ($settings->quicksearch->getValues() as $value) {
 				switch ($settings->quicksearch->getBounds()) {
-					case 'left':$boundValue = '%' . $value;
+					case 'left':
+						$boundValue = '%' . $value;
 						break;
-					case 'right':$boundValue = $value . '%';
+					case 'right':
+						$boundValue = $value . '%';
 						break;
-					case 'both':$boundValue = '%' . $value . '%';
+					case 'both':
+						$boundValue = '%' . $value . '%';
 						break;
 				}
 				$quotedValue = Db::quote($boundValue);
 				foreach ($settings->quicksearch->getColumns() as $column) {
 					if ($column instanceof Expr) {
-						$or[] = str_replace('?', $quotedValue, (string) $column);
+						$or[] = str_replace('?', $quotedValue, (string)$column);
 						continue;
 					} else if (($attribute = $this->_api->getAttribute($column))) {
 						$table = $this->_api->table . '.`' . Translation::getColumn($attribute);
@@ -126,7 +132,7 @@ abstract class AbstractAdapter {
 							case \AttributeType::Number:
 							case \AttributeType::Year:
 								if (is_numeric($value)) {
-									$or[] = $table . '`=' . (int) $value;
+									$or[] = $table . '`=' . (int)$value;
 								}
 								continue 2;
 						}
@@ -144,12 +150,12 @@ abstract class AbstractAdapter {
 	protected function initSelect($settings) {
 
 		$this
-				->initColumns($settings)
-				->initJoins($settings)
-				->initFilters($settings)
-				->initOrder($settings)
-				->initGroup($settings)
-				->initLimit($settings);
+			->initColumns($settings)
+			->initJoins($settings)
+			->initFilters($settings)
+			->initOrder($settings)
+			->initGroup($settings)
+			->initLimit($settings);
 
 		if (method_exists($this->_api, 'beforeSelect')) {
 			$this->_api->beforeSelect($this->_query);
@@ -171,14 +177,14 @@ abstract class AbstractAdapter {
 				$table = $this->_api->table;
 				$translationTable = Translation::getTable($this->_api);
 				$this->joinLeft($translationTable, $translationTable . '.translatable_id=`' . $table . '`.id'
-						. ' AND `' . $translationTable . '`.`language`="' . $language->code . '"', null);
+					. ' AND `' . $translationTable . '`.`language`="' . $language->code . '"', null);
 				break;
 			}
 		}
 
 		foreach ($settings->joins as $join) {
 			if ($columns) {
-				$cols = array();
+				$cols = [];
 				foreach ($join->columns->get() as $column) {
 					if ($settings->columns->hasName($column->alias)) {
 						$cols[] = $this->getColumnExpression($column);
@@ -191,9 +197,11 @@ abstract class AbstractAdapter {
 				$cols = null;
 			}
 			switch ($join->type) {
-				case 'inner':$this->joinInner($join->getTableName(), $join->condition, $cols);
+				case 'inner':
+					$this->joinInner($join->getTableName(), $join->condition, $cols);
 					break;
-				case 'right':$this->joinRight($join->getTableName(), $join->condition, $cols);
+				case 'right':
+					$this->joinRight($join->getTableName(), $join->condition, $cols);
 					break;
 				//case 'outer':$this->joinOuter($join->name . ' as ' . $join->alias, $join->condition, $cols);break;
 				default:
@@ -204,13 +212,14 @@ abstract class AbstractAdapter {
 	}
 
 	protected function initOrder($settings) {
-		$order = array();
+		$order = [];
 		foreach ($settings->order->get() as $item) {
 			switch (true) {
-				case (bool) $item->expression:
+				case (bool)$item->expression:
 					$order[] = $item->expression;
 					break;
-				case (!$item->name):break;
+				case (!$item->name):
+					break;
 				case ($item->name instanceof Expr):
 					$order[] = $item->name;
 					break;
@@ -218,7 +227,7 @@ abstract class AbstractAdapter {
 				case $item->name === 'random':
 					$order[] = 'RAND()';
 					break;
-				case (bool) ($table = $this->getColumnTable($settings, $item->name, true)):
+				case (bool)($table = $this->getColumnTable($settings, $item->name, true)):
 					$order[] = $table . ' ' . $item->direction;
 					break;
 				default:
@@ -237,7 +246,7 @@ abstract class AbstractAdapter {
 	}
 
 	protected function initGroup($settings, $count = false) {
-		$group = array();
+		$group = [];
 		foreach ($settings->group->getNames() as $name) {
 			if (($table = $this->getColumnTable($settings, $name, true))) {
 				$group[] = $table;
@@ -263,12 +272,12 @@ abstract class AbstractAdapter {
 					$flds = $flds['fields'];
 				}
 			} else {
-				$options['groupby'] = array();
+				$options['groupby'] = [];
 			}
 			if (!is_array($flds)) {
-				$flds = array($flds);
+				$flds = [$flds];
 			}
-			$gb = array();
+			$gb = [];
 			foreach ($flds as $g) {
 				if (isset($attributes[$g]))
 					$gb[] = $g;
@@ -277,11 +286,11 @@ abstract class AbstractAdapter {
 				$this->group($gb);
 				if ($count) {
 					$this->_query = \Db::from($this->_query, 'count(*)');
-				} elseif (isset($options['groupby']['func'])) {
+				} else if (isset($options['groupby']['func'])) {
 					$func = $options['groupby']['func'];
 					if (is_array($func)) {
 						if (!isset($func[0][0])) {
-							$func = array($func);
+							$func = [$func];
 						}
 						foreach ($func as $fn) {
 							if (is_array($fn) && isset($fn[0]) && isset($fn[1])) {
@@ -318,17 +327,17 @@ abstract class AbstractAdapter {
 				continue;
 			switch ($attribute->getType()) {
 				case 'boolean':
-					$data[$attribute->name] = (bool) $data[$attribute->name];
+					$data[$attribute->name] = (bool)$data[$attribute->name];
 					break;
 				case 'model':
 				case 'year':
-					$data[$attribute->name] = (int) $data[$attribute->name];
+					$data[$attribute->name] = (int)$data[$attribute->name];
 					break;
 				case 'enum':
-					$data[$attribute->name] = is_numeric($data[$attribute->name]) ? (int) $data[$attribute->name] : $data[$attribute->name];
+					$data[$attribute->name] = is_numeric($data[$attribute->name]) ? (int)$data[$attribute->name] : $data[$attribute->name];
 					break;
 				case 'number':
-					$data[$attribute->name] = $attribute->fractionDigits ? (float) $data[$attribute->name] : (int) $data[$attribute->name];
+					$data[$attribute->name] = $attribute->fractionDigits ? (float)$data[$attribute->name] : (int)$data[$attribute->name];
 					break;
 			}
 		}
@@ -352,4 +361,5 @@ abstract class AbstractAdapter {
 	abstract public function group($group);
 
 	abstract public function query($query);
+
 }

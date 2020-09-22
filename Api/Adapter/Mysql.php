@@ -1,4 +1,5 @@
 <?php
+
 namespace Api\Adapter;
 
 use Db;
@@ -9,8 +10,8 @@ use Api\Attribute\AttributeDate;
 use Api\Attribute\AttributeNumber;
 use Api\File as ApiFile;
 
-class Mysql extends AbstractAdapter{
-	
+class Mysql extends AbstractAdapter {
+
 	const LOCALE_KEY = '_locale';
 
 	private static $_simpleComparisonTypes = [
@@ -44,13 +45,13 @@ class Mysql extends AbstractAdapter{
 	}
 
 	protected function _quote($key) {
-        return '`' . $this->_api->table . '`.`' . $key . '`';
-    }
+		return '`' . $this->_api->table . '`.`' . $key . '`';
+	}
 
 	private function prepareValue($attr, $expr, $key, $single = false) {
 		if (!isset($expr[$key]))
 			return null;
-		
+
 		if ($single) {
 			if (is_array($expr[$key]))
 				return null;
@@ -63,38 +64,49 @@ class Mysql extends AbstractAdapter{
 					$val = null;
 					$fld = $this->_quote($attr->name);
 					switch ($expr[$key]) {
-						case 'today':$val = 'DATE_FORMAT(' . $fld . ', "%y-%m-%d")="' . date('y-m-d') . '"';break;
-						case 'week':$val = 'YEARWEEK(' . $fld . ')="' . date('YW') . '"';break;
-						case 'month':$val = 'DATE_FORMAT(' . $fld . ', "%y-%m")="' . date('y-m') . '"';break;
-						case 'all': return null;
+						case 'today':
+							$val = 'DATE_FORMAT(' . $fld . ', "%y-%m-%d")="' . date('y-m-d') . '"';
+							break;
+						case 'week':
+							$val = 'YEARWEEK(' . $fld . ')="' . date('YW') . '"';
+							break;
+						case 'month':
+							$val = 'DATE_FORMAT(' . $fld . ', "%y-%m")="' . date('y-m') . '"';
+							break;
+						case 'all':
+							return null;
 					}
 					if ($val) {
-						return array(
+						return [
 							'condition' => $val,
 							'value' => null
-						);
+						];
 					}
 				}
 				if (
 					in_array(
 						$expr['comparison'],
-						array(
+						[
 							\ComparisonType::Interval,
 							\ComparisonType::IntervalIncludingBounds,
 							\ComparisonType::IntervalIncludingLowerBound,
 							\ComparisonType::IntervalIncludingUpperBound
-						)
+						]
 					)
-						&& $attr->dateFractions == AttributeDate::DateTime
-						&& strlen($expr[$key]) == 10
+					&& $attr->dateFractions == AttributeDate::DateTime
+					&& strlen($expr[$key]) == 10
 				) {
 					switch ($key) {
-						case 'valueFrom':$expr[$key] .= ' 00:00:00';break;
-						case 'valueTo':$expr[$key] .= ' 23:59:59';break;
+						case 'valueFrom':
+							$expr[$key] .= ' 00:00:00';
+							break;
+						case 'valueTo':
+							$expr[$key] .= ' 23:59:59';
+							break;
 					}
 
 				}
-			break;
+				break;
 		}
 
 		return $attr->prepareValue($expr[$key]);
@@ -138,22 +150,22 @@ class Mysql extends AbstractAdapter{
 			$this->where($item->value);
 			return;
 		}
-		
+
 		if (!isset(self::$_comparisonTypesAssoc[$item->comparisonType]))
 			return;
-		
+
 		if (($attribute = $item->attribute)) {
 
-		} elseif ($item->name === 'id')
+		} else if ($item->name === 'id')
 			$attribute = new AttributeNumber('id');
 		else
 			$attribute = $this->_api->getAttribute($item->name);
-		
+
 		if ($attribute->locale)
 			$column = '`' . Translation::getTable($this->_api) . '`.`' . $item->name . '`';
 		else
 			$column = '`' . $item->table . '`.`' . $item->name . '`';
-		
+
 		$condition = self::$_comparisonTypesAssoc[$item->comparisonType];
 		$value = $item->value;
 		if (in_array($item->comparisonType, self::$_simpleComparisonTypes)) {
@@ -177,9 +189,9 @@ class Mysql extends AbstractAdapter{
 				case \ComparisonType::InList:
 				case \ComparisonType::NotInList:
 					if (!is_array($value)) {
-						$value = array($value);
+						$value = [$value];
 					}
-					if (empty($value)){
+					if (empty($value)) {
 						$condition = null;
 					} else {
 						$condition = $condition . ' (?)';
@@ -217,18 +229,18 @@ class Mysql extends AbstractAdapter{
 	public function write(array $data) {
 		//if ($this->_api->id === null)
 		//	throw new Exception('Empty id error');
-		
+
 		/*if (isset($data[self::LOCALE_KEY]) && Translation::getLanguage($data[self::LOCALE_KEY]))
 			$languageCode = $data[self::LOCALE_KEY];
 		else
 			$languageCode = Translation::getCode();*/
-		
+
 		unset($data['id']);
-		
+
 		$localeData = [];
-		
+
 		$primary = [];
-				
+
 		foreach ($this->_api->getAttributes() as $attribute) {
 			if ($attribute->name === 'id') {
 				unset($data[$attribute->name]);
@@ -246,33 +258,33 @@ class Mysql extends AbstractAdapter{
 					$primary[$attribute->name] = $primary[$attribute->name]->id;
 			}
 		}
-		
+
 		$isNew = $this->_api->isNew();
 		if ($isNew) {
 			$result = Db::insert($this->_api->table, $data);
 		} else if (empty($primary))
 			throw new Exception('Primary data empty');
-		else if (empty($data)) 
+		else if (empty($data))
 			$result = $this->_api->id;
 		else
 			$result = Db::update($this->_api->table, $data, $primary);
-		
+
 		if (!$result)
 			return false;
-		
+
 		if (!$localeData || $result === true)
 			return $result;
-		
+
 		$id = $result;
-		
+
 		$languageCode = Translation::getCode();
 		$translationTable = Translation::getTable($this->_api);
-		
+
 		$flag = !$isNew && (bool)Db::from($translationTable)
 				->where('translatable_id=?', $id)
 				->where('language="' . $languageCode . '"')
 				->query()->fetchRow();
-		
+
 		$where = [
 			'translatable_id' => $id,
 			'language' => $languageCode
@@ -282,7 +294,7 @@ class Mysql extends AbstractAdapter{
 			$flag = Db::update($translationTable, $localeData, $where);
 		else
 			$flag = Db::insert($translationTable, array_merge($localeData, $where));
-		
+
 		return $id;
 	}
 
@@ -319,9 +331,9 @@ class Mysql extends AbstractAdapter{
 		//$c = '`' .  $this->_api->table . '`.id';
 		$this->_query = Db::from($this->_api->table, 'count(*)');
 		$this
-				->initFilters($settings)
-				->initJoins($settings, false)
-				->initGroup($settings, true);
+			->initFilters($settings)
+			->initJoins($settings, false)
+			->initGroup($settings, true);
 
 		if (method_exists($this->_api, 'beforeCount')) {
 			$this->_api->beforeCount($this->_query);
@@ -333,11 +345,11 @@ class Mysql extends AbstractAdapter{
 
 		$this->_query = \Db::from($this->_api->table, null);
 		$this
-				->initColumns($settings)
-				->initJoins($settings)
-				->initFilters($settings)
-				->initOrder($settings);
-		
+			->initColumns($settings)
+			->initJoins($settings)
+			->initFilters($settings)
+			->initOrder($settings);
+
 		if (method_exists($this->_api, 'beforeData')) {
 			$this->_api->beforeData($this->_query);
 		}
@@ -353,7 +365,7 @@ class Mysql extends AbstractAdapter{
 	public function query($query) {
 		return \Db::query($query);
 	}
-	
+
 	public function columns($columns) {
 		$this->_query->columns($columns);
 		return $this;
@@ -393,7 +405,7 @@ class Mysql extends AbstractAdapter{
 	}
 
 	public function fieldToAttributeParams($field) {
-		$params = array();
+		$params = [];
 		$fieldType = explode(' ', $field['Type']);
 		$fieldTypeAttr = (isset($fieldType[1]) ? $fieldType[1] : null);
 		$fieldType = $fieldType[0];
@@ -421,7 +433,7 @@ class Mysql extends AbstractAdapter{
 			case 'mediumint':
 			case 'int':
 				$type = \AttributeType::Number;
-				$params['digits'] = $fieldTypeParam;				
+				$params['digits'] = $fieldTypeParam;
 				break;
 			case 'float':
 			case 'decimal':

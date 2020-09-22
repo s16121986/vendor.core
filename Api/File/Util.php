@@ -18,13 +18,23 @@ abstract class Util {
 
 	public static function setConfig($config) {
 		self::$config = $config;
+		if (isset($config['table'])) {
+			self::$table = $config['table'];
+			self::$tableParts = self::$table . '_parts';
+		}
 	}
-	
+
 	public static function setHttpUrlTemplate($tpl) {
 		self::$httpUrlTpl = $tpl;
 	}
 
 	public static function config($name, $default = null) {
+		switch ($name) {
+			case 'table':
+				return self::$table;
+			case 'table_parts':
+				return self::$tableParts;
+		}
 		return isset(self::$config[$name]) ? self::$config[$name] : $default;
 	}
 
@@ -135,7 +145,7 @@ abstract class Util {
 
 		return true;
 	}
-	
+
 	public static function getHttpUrl($file) {
 		$tpl = self::$httpUrlTpl;
 		return str_replace('%guid%', (string)$file ?? 'empty', $tpl);
