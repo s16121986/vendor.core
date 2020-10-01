@@ -8,7 +8,18 @@ abstract class Autoload{
 	}
 	
 	public static function addPath($path, $class, $replace = null) {
-		self::$paths[] = [$path, $class, $replace];
+		$pathElement = new stdClass();
+		$pathElement->path = $path;
+		$pathElement->class = $class;
+		$pathElement->replace = $replace;
+
+		foreach (self::$paths as $i => $pe) {
+			if (0 !== strpos($class, $pe->class))
+				continue;
+			array_splice(self::$paths, $i, 0, [$pathElement]);
+			return;
+		}
+		self::$paths[] = $pathElement;
 	}
 	
 	public static function getPaths() {
@@ -18,12 +29,12 @@ abstract class Autoload{
 	public static function init($defaultPath) {
 		spl_autoload_register(function($class) use($defaultPath) {
 			foreach (Autoload::getPaths() as $path) {
-				if ($path[1] && 0 !== strpos($class, $path[1]))
+				if ($path->class && 0 !== strpos($class, $path->class))
 						continue;
 				$cls = $class;
-				if ($path[2] !== null)
-					$cls = str_replace($path[1], $path[2], $cls);
-				return Autoload::include($cls, $path[0], false);
+				if ($path->replace !== null)
+					$cls = str_replace($path->class, $path->replace, $cls);
+				return Autoload::include($cls, $path->path, false);
 			}
 			return Autoload::include($class, $defaultPath, false);
 		});

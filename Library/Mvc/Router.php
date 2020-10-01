@@ -65,6 +65,7 @@ class Router{
 	}
 	
 	public function shiftPath() {
+		$this->getPath();
 		array_shift($this->requestPath);
 	}
 
