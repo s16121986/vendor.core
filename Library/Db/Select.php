@@ -429,7 +429,7 @@ class Select{
         } else if ($name instanceof Db\Expr|| $name instanceof Db_Select) {
             $tableName = $name;
             $correlationName = $this->_uniqueCorrelation('t');
-        } else if (preg_match('/^(.+)\s+AS\s+(.+)$/i', $name, $m)) {
+        } else if (preg_match('/^(\w+)\s+(?:AS\s+)?(\w+)$/i', $name, $m)) {
             $tableName = $m[1];
             $correlationName = $m[2];
         } else {
