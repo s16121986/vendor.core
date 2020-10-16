@@ -32,7 +32,7 @@ class Row{
 			if (array_key_exists($attribute->name, $data))
 				$setFlag = $attribute->setValue($data[$attribute->name]);
 			else
-				$setFlag = $attribute->setValue(null);
+				$setFlag = $attribute->setValue($attribute->default);
 			
 			if ($setFlag) {
 				$rowData[$attribute->name] = $attribute->getValue();
