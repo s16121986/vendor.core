@@ -56,10 +56,12 @@ class Data {
 	}
 
 	public function get() {
-		if (null === $this->data) {
-			$this->load();
-		}
-		return $this->data;
+		if (null !== $this->data)
+			return $this->data;
+		else if ($this->api)
+			return $this->load();
+		else
+			return [];
 	}
 
 	public function load($params = []) {
@@ -70,11 +72,10 @@ class Data {
 			}
 		}
 		$this->setParams($params);
-		$params = $this->getParams();
 		if ($this->paginator) {
-			$this->paginator->setCount($this->count($params));
-			$params = $this->getParams();
+			$this->paginator->setCount($this->count());
 		}
+		$params = $this->getParams();
 		$this->set($this->api->select($params)->getItems());
 		return $this->data;
 	}
