@@ -142,7 +142,8 @@ abstract class AbstractAdapter {
 					}
 				}
 			}
-			$this->where(implode(' OR ', $or));
+			if ($or)
+				$this->where(implode(' OR ', $or));
 		}
 		return $this;
 	}
