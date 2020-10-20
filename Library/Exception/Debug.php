@@ -1,6 +1,8 @@
 <?php
 
-class Debug{
+namespace Exception;
+
+class Debug {
 
 	private static $memoryUsage;
 
