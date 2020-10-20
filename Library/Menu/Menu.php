@@ -1,60 +1,61 @@
 <?php
+
 namespace Menu;
 
 use Menu\Util\AbstractItem;
 use Menu\Util\Item;
 
-class Menu extends AbstractItem{
-	
-	protected static $optionsAssoc = array(
+class Menu extends AbstractItem {
+
+	protected static $optionsAssoc = [
 		'cls' => 'class'
-	);
-	
-	protected $options = array(
+	];
+
+	protected $options = [
 		'nodeType' => 'nav'
-	);
-	protected $items = array();
+	];
+	protected $items = [];
 	protected $relativePath = '/';
 	protected $manager = null;
 	protected $current = null;
-	
+
 	public function __set($name, $value) {
 		if (isset(self::$optionsAssoc[$name])) {
 			$name = self::$optionsAssoc[$name];
 		}
 		return parent::__set($name, $value);
 	}
-	
+
 	public function __get($name) {
 		if (isset(self::$optionsAssoc[$name])) {
 			$name = self::$optionsAssoc[$name];
 		}
 		return parent::__get($name);
 	}
-	
+
 	public function setItems($items) {
-		$this->items = array();
+		$this->items = [];
 		foreach ($items as $item) {
 			$this->add($item);
 		}
 		return $this;
 	}
-	
+
 	public function getItems() {
 		return $this->items;
 	}
-	
+
 	public function setRelativePath($path) {
 		$this->relativePath = $path;
 		return $this;
 	}
-	
+
 	public function setCurrent($current) {
 		$this->current = $current;
 		return $this;
 	}
-	
-	public function add($label, $uri = null, $action = null, $options = array()) {
+
+	public function add($label, $uri = null, $action = null, $options = []) {
 		if ($label instanceof Item) {
 			$item = clone $label;
 		} else {
@@ -71,14 +72,14 @@ class Menu extends AbstractItem{
 		$this->items[] = $item;
 		return $this;
 	}
-	
+
 	public function getManager() {
 		if (null === $this->manager) {
 			$this->manager = new Manager($this);
 		}
 		return $this->manager;
 	}
-	
+
 	public function getHtml() {
 		if (empty($this->items)) {
 			return '';
@@ -88,66 +89,73 @@ class Menu extends AbstractItem{
 			$html .= $this->getItemHtml($item);
 		}
 		if ($this->nodeType) {
-			$html = '<' . $this->nodeType . self::getNodeAttributes($this) . '>' . $html . '</' . $this->nodeType. '>';
+			$html = '<' . $this->nodeType . self::getNodeAttributes($this) . '>' . $html . '</' . $this->nodeType . '>';
 		}
 		return $html;
 	}
-	
-	public function render($options = array()) {
+
+	public function render($options = []) {
 		$this->setOptions($options);
 		return $this->getHtml();
 	}
-	
+
 	protected function getItemHtml($item) {
 		switch (true) {
-			case ($item->label === '-'):return ($this->itemNodeType ? '<' . $this->itemNodeType . ' class="hr"></' . $this->itemNodeType . '>' : '<hr />');
+			case ($item->label === '-'):
+				return ($this->itemNodeType ? '<' . $this->itemNodeType . ' class="hr"></' . $this->itemNodeType . '>' : '<hr />');
 		}
+
 		$html = '';
-		$class = array();
+		$class = [];
 		//var_dump($this->getRoot()->options, $this->parent);
-		if ($item->action && $item->action === $this->getRoot()->current) {
+		if ($item->action && $item->action === $this->getRoot()->current)
 			$class[] = 'current';
-		}
+
 		$node = $this->itemNodeType;
 		if (!$item->href) {
 			$class[] = 'disabled';
-			if (!$node) $node = 'div';
+			if (!$node)
+				$node = 'div';
 		}
+
 		$attr = self::getNodeAttributes($item, implode(' ', $class));
 		if ($node) {
 			$html .= '<' . $node . $attr . '>';
 			$attr = '';
 		}
-		$text = ($item->icon ? '<i class="fa fa-' . $item->icon . '"></i>' : '')
-				. $item->text;
+
+		$text = $item->icon . $item->text;
 		if ($item->href) {
 			$html .= '<a href="' . $this->_url($item->href) . '"' . $attr . '>' . $text . '</a>';
 		} else {
 			$html .= '<div class="label">' . $text . '</div>';
 		}
-		if ($item->menu) {
+
+		if ($item->menu)
 			$html .= $item->menu->getHtml();
-		}
-		if ($node) {
+
+		if ($node)
 			$html .= '</' . $node . '>';
-		}
+
 		return $html;
 	}
-	
+
 	protected function _url($url, $path = null) {
 		if (0 !== strpos($url, '/') && 0 !== strpos($url, 'http') && 0 !== strpos($url, '#')) {
 			$url = $this->relativePath . ($path ? $path . '/' : '') . $url;
 		}
 		return $url;
 	}
-	
+
 	protected static function getNodeAttributes($item, $extraCls = '') {
-		$class = array();
-		if ($extraCls) $class[] = $extraCls;
-		if ($item->class) $class[] = $item->class;
+		$class = [];
+		if ($extraCls)
+			$class[] = $extraCls;
+		if ($item->class)
+			$class[] = $item->class;
 		return ($item->id ? ' id="' . $item->id . '"' : '')
-			. ($class ? ' class="' . implode(' ', $class) . '"' : '') 
+			. ($class ? ' class="' . implode(' ', $class) . '"' : '')
 			. ($item->attr ? ' ' . $item->attr : '');
 	}
-	
+
 }
