@@ -69,9 +69,12 @@ abstract class Api extends Api\Util\BaseApi {
 				return $this->$name;
 		}
 		switch (true) {
-			case isset($this->attributes[$name]): return $this->attributes[$name]->getValue();
-			case isset($this->tabularSections[$name]): return $this->tabularSections[$name];
-			case array_key_exists($name, $this->record): return $this->record[$name];
+			case isset($this->attributes[$name]):
+				return $this->attributes[$name]->getValue();
+			case isset($this->tabularSections[$name]):
+				return $this->tabularSections[$name];
+			case array_key_exists($name, $this->record):
+				return $this->record[$name];
 		}
 
 		return parent::__get($name);
@@ -110,9 +113,9 @@ abstract class Api extends Api\Util\BaseApi {
 			$this->reset();
 			$this->id = $id;
 			return true;
-		} elseif ($this->id === $id) {
+		} else if ($this->id === $id) {
 			return true;
-		} elseif ($id) {
+		} else if ($id) {
 			return $this->findById($id);
 		}
 		return false;
@@ -148,12 +151,12 @@ abstract class Api extends Api\Util\BaseApi {
 	}
 
 	public function findById($id, $options = null) {
-		return $this->findByAttribute('id', (int) $id, $options);
+		return $this->findByAttribute('id', (int)$id, $options);
 	}
 
 	public function findByAttribute($name, $value, $options = null) {
 		if (!is_array($options)) {
-			$options = array();
+			$options = [];
 		}
 		$options[$name] = $value;
 		return $this->findByAttributes($options);
@@ -164,7 +167,7 @@ abstract class Api extends Api\Util\BaseApi {
 		$record = $this->getAdapter()->get($settings);
 		$this->reset();
 		if (!$record)
-		//throw new \Api\Exception(Exception::);
+			//throw new \Api\Exception(Exception::);
 			return false;
 		$this->_setRecord($record);
 
@@ -203,7 +206,7 @@ abstract class Api extends Api\Util\BaseApi {
 		if ($data)
 			$this->setData($data);
 
-		if (/* false === EventManager::trigger('beforeWrite', $this) || */false === $this->beforeWrite())
+		if (/* false === EventManager::trigger('beforeWrite', $this) || */ false === $this->beforeWrite())
 			return false;
 
 		if (isset($this->attributes['id']) && null === $this->id)
@@ -214,15 +217,15 @@ abstract class Api extends Api\Util\BaseApi {
 			foreach ($this->attributes as $k => $attribute) {
 				//if ($attribute->type == \Api\Attribute::T_File) continue;
 				if (in_array($k, ['created', 'updated', 'id'])) {
-					
-				} elseif ($attribute instanceof AttributeFile)
+
+				} else if ($attribute instanceof AttributeFile)
 					continue;
-				elseif ($attribute instanceof AttributePredefined)
+				else if ($attribute instanceof AttributePredefined)
 					$this->_set($k, $attribute->value);
 				else if ($attribute->isEmpty()) {
 					if ($attribute->required)
 						throw new AttributeException($attribute, 'Attribute "' . $attribute->name . '" value undefined', Exception::ATTRIBUTE_REQUIRED);
-					elseif ($attribute instanceof AttributeFile)
+					else if ($attribute instanceof AttributeFile)
 						continue;
 					else if ($attribute->notnull && null === $attribute->default)
 						continue;
@@ -270,7 +273,7 @@ abstract class Api extends Api\Util\BaseApi {
 
 	public function delete($data = null) {
 		if ($this->getAttribute('deletion_mark'))
-			return (bool) $this->getAdapter()->write(['deletion_mark' => true]);
+			return (bool)$this->getAdapter()->write(['deletion_mark' => true]);
 
 		if (!DeleteTransaction::initialized())
 			return DeleteTransaction::init($this, false);
@@ -316,7 +319,7 @@ abstract class Api extends Api\Util\BaseApi {
 	}
 
 	protected function _setRecord($record) {
-		if (isset($this->attributes['id']))
+		if (isset($this->attributes['id']) && isset($record['id']))
 			$this->id = $record['id'];
 		$this->record = $record;
 
@@ -373,19 +376,19 @@ abstract class Api extends Api\Util\BaseApi {
 	}
 
 	protected function beforeWrite() {
-		
+
 	}
 
 	protected function afterWrite($isNew = false) {
-		
+
 	}
 
 	protected function beforeDelete() {
-		
+
 	}
 
 	protected function afterDelete() {
-		
+
 	}
 
 	public function uuid() {
@@ -396,7 +399,7 @@ abstract class Api extends Api\Util\BaseApi {
 			if (!$attribute->primary)
 				continue;
 
-			$pk[] = (string) $attribute->getValue();
+			$pk[] = (string)$attribute->getValue();
 		}
 
 		return $uuid . '_' . implode('-', $pk);
