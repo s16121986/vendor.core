@@ -53,7 +53,7 @@ class Numrange extends Text{
 				. ' class="field-number"'
 				. ' name="' . $inputName . '[valueTo]"'
 				. $this->_attr('min', 1, 0)
-				. $this->_attr('placeholder', 0)
+				. $this->_attr('placeholder', 1)
 				. ' value="' . ($values ? $values['valueTo'] : '') . '" />';
 		$s .= '</div>';
 		return $s;
