@@ -2,6 +2,8 @@
 
 namespace Http;
 
+use Exception;
+
 class Cookies {
 
 	private static $domain = null;
@@ -9,8 +11,8 @@ class Cookies {
 		'path' => '/',
 		'domain' => '', // leading dot for compatibility or use subdomain
 		'secure' => false, // or false
-		'httponly' => true, // or false
-		'samesite' => 'None' // None || Lax || Strict
+		'httponly' => true//, // or false
+		//'samesite' => 'None' // None || Lax || Strict
 	];
 
 	public static function setDomain($domain) {
@@ -28,6 +30,9 @@ class Cookies {
 	}
 
 	public static function set($name, $cookie, $time, $path = '/', $host = null, $secure = null, $httpOnly = true) {
+		if (headers_sent())
+			throw new Exception("Can't change cookie " . $name . " after sending headers.");
+
 		if (null === $secure)
 			$secure = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off');
 
