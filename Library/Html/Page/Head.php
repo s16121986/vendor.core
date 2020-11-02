@@ -221,7 +221,7 @@ class Head {
 				return $html;
 			case 'async':
 				$format = [
-					'async' => true,
+					'preScript' => true,
 					'styles' => false,
 					'scripts' => false
 				];
@@ -242,7 +242,7 @@ class Head {
 			$html .= $meta->getHtml() . "\n";
 		}
 
-		if ($flag('async'))
+		if ($flag('preScript'))
 			$html .= $this->renderPreScript();
 		if ($flag('scripts'))
 			$html .= $this->getHtml('scripts');
