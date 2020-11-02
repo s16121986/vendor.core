@@ -1,9 +1,10 @@
 <?php
 
 use Form\Fieldset as AbstractFeildset;
+
 //use Api;
 
-class Form extends AbstractFeildset{
+class Form extends AbstractFeildset {
 
 	const METHOD_GET = 'GET';
 	const METHOD_POST = 'POST';
@@ -11,20 +12,20 @@ class Form extends AbstractFeildset{
 	const METHOD_PUT = 'PUT';
 
 	protected $_submitted = false;
-	protected $_errors = array();
+	protected $_errors = [];
 	protected $_api;
-	protected $_options = array(
+	protected $_options = [
 		'api' => null,
 		'name' => null,
-		'baseParams' => array(),
+		'baseParams' => [],
 		'method' => 'POST',
 		'submitAction' => 'submit',
 		'successMessage' => false
-	);
+	];
 
 	public function __construct($options = null) {
 		if (is_string($options)) {
-			$options = array('name' => $options);
+			$options = ['name' => $options];
 		}
 		if (isset($options['api']) && !isset($options['submitAction'])) {
 			$options['submitAction'] = 'apiSubmit';
@@ -32,13 +33,17 @@ class Form extends AbstractFeildset{
 		parent::__construct($options);
 		$this->init();
 	}
-	
-	protected function init() {}
-		
+
+	protected function init() { }
+
 	public function addElement($element, $type = null, array $options = []) {
 		parent::addElement($element, $type, $options);
 		$this->setSubmitted(false);
 		return $this;
+	}
+
+	public function setMethod($method) {
+		return $this->setOption('method', $method);
 	}
 
 	public function setData($data) {
@@ -62,7 +67,8 @@ class Form extends AbstractFeildset{
 
 	public function isSent() {
 		switch ($this->method) {
-			case self::METHOD_POST:return ('POST' == $_SERVER['REQUEST_METHOD'] && (!$this->getName() || (isset($_POST[$this->getName()]) || isset($_FILES[$this->getName()]))));
+			case self::METHOD_POST:
+				return ('POST' == $_SERVER['REQUEST_METHOD'] && (!$this->getName() || (isset($_POST[$this->getName()]) || isset($_FILES[$this->getName()]))));
 			case self::METHOD_GET:
 				$data = ($this->getName() ? (isset($_GET[$this->getName()]) ? $_GET[$this->getName()] : null) : $_GET);
 				return !empty($data);//('GET' == $_SERVER['REQUEST_METHOD'] && (!$this->getName() || (isset($_GET[$this->getName()]))));
@@ -75,7 +81,7 @@ class Form extends AbstractFeildset{
 		$action = new $cls($this, $options);
 		if ($action->submit())
 			return true;
-		
+
 		return false;
 	}
 
@@ -127,7 +133,7 @@ class Form extends AbstractFeildset{
 		foreach ($this->_elements as $element) {
 			$element->reset();
 		}
-		$this->_errors = array();
+		$this->_errors = [];
 		$this->_submitted = false;
 	}
 
@@ -143,7 +149,7 @@ class Form extends AbstractFeildset{
 		foreach ($elements as $k) {
 			if (isset($this->_elements[$k]) && $this->_elements[$k]->render && !$this->_elements[$k]->isRendered()) {
 
-				if (in_array($this->_elements[$k]->type, array('hidden'))) {
+				if (in_array($this->_elements[$k]->type, ['hidden'])) {
 					$html .= $this->_elements[$k]->render();
 					continue;
 				}
@@ -158,19 +164,23 @@ class Form extends AbstractFeildset{
 	}
 
 	public function addAttribute($attribute) {
-		$systemFields = array('id', 'created', 'updated');
+		$systemFields = ['id', 'created', 'updated'];
 		if ($attribute->hidden || in_array($attribute->name, $systemFields)) {
 			return;
 		}
-		$options = array(
+		$options = [
 			'label' => lang(($this->api ? strtolower($this->api->getModelName()) : 'attribute') . '_' . $attribute->name),
 			'required' => $attribute->required,
 			'default' => $attribute->default
-		);
+		];
 		$attributeType = strtolower(str_replace('Api\\Attribute\\', '', get_class($attribute)));
 		switch ($attributeType) {
-			case AttributeType::Boolean:$type = 'checkbox';break;
-			case AttributeType::Date:$type = 'date';break;
+			case AttributeType::Boolean:
+				$type = 'checkbox';
+				break;
+			case AttributeType::Date:
+				$type = 'date';
+				break;
 			case AttributeType::Enum:
 				$type = 'enum';
 				$options['enum'] = $attribute->enum;
@@ -182,7 +192,9 @@ class Form extends AbstractFeildset{
 				$type = 'number';
 				$options['fractionDigits'] = $attribute->fractionDigits;
 				break;
-			case AttributeType::String:$type = 'text';break;
+			case AttributeType::String:
+				$type = 'text';
+				break;
 			case AttributeType::Year:
 				$type = 'year';
 				if (false === $attribute->notnull) {
@@ -213,11 +225,11 @@ class Form extends AbstractFeildset{
 		return $this;
 	}
 
-	public function submitApi($options = array()) {
+	public function submitApi($options = []) {
 		return $this->doAction('apiSubmit', $options);
 	}
-	
-	public function bind($action, $callback, $params = array()) {
+
+	public function bind($action, $callback, $params = []) {
 		EventManager::bind($this, $action, $callback, $params);
 	}
 
