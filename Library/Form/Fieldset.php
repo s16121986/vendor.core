@@ -1,22 +1,23 @@
 <?php
+
 namespace Form;
 
 use Form\Element;
 
-class Fieldset{
+class Fieldset {
 
-	protected static $_defaultElementOptions = array(
+	protected static $_defaultElementOptions = [
 		'requiredLabel' => ''
-	);
-	
-	protected $_elements = array();
-	protected $_values = array();
+	];
+
+	protected $_elements = [];
+	protected $_values = [];
 	protected $_parent = null;
-	protected $_options = array(
+	protected $_options = [
 		'name' => null,
-		'baseParams' => array(),
-	);
-	
+		'baseParams' => [],
+	];
+
 	public static function setDefaults($defaults) {
 		self::$_defaultElementOptions = $defaults;
 	}
@@ -27,12 +28,17 @@ class Fieldset{
 
 	public function __get($name) {
 		switch ($name) {
-			case 'name':return $this->getName();
-			case 'id':return $this->getId();
-			case 'data':return $this->getData();
-			case 'errors':return $this->getErrors();
+			case 'name':
+				return $this->getName();
+			case 'id':
+				return $this->getId();
+			case 'data':
+				return $this->getData();
+			case 'errors':
+				return $this->getErrors();
 		}
-		if (isset($this->_options[$name])) return $this->_options[$name];
+		if (isset($this->_options[$name]))
+			return $this->_options[$name];
 		return $this->getElement($name);
 	}
 
@@ -64,15 +70,19 @@ class Fieldset{
 		}
 		return $this;
 	}
-	
+
+	public function setId($method) {
+		return $this->setOption('id', $method);
+	}
+
 	public function getName() {
 		return $this->_options['name'];
 	}
-	
+
 	public function getId() {
-		if (isset($this->_options['id'])) {
+		if (isset($this->_options['id']))
 			return $this->_options['id'];
-		}
+
 		return ($this->name ? strtolower(str_replace('\\', '_', get_class($this))) . '_' . $this->name : null);
 	}
 
@@ -90,7 +100,7 @@ class Fieldset{
 
 	public function addElement($element, $type = null, array $options = []) {
 		if (!is_array($options)) {
-			$options = array();
+			$options = [];
 		}
 
 		foreach (self::$_defaultElementOptions as $k => $v) {
@@ -110,10 +120,10 @@ class Fieldset{
 				include 'Library/' . str_replace('\\', '/', $cls) . '.php';
 			}*/
 			$element = new $cls($element, $options);
-		} elseif ($element instanceof Element) {
+		} else if ($element instanceof Element) {
 
 		} else {
-			
+
 		}
 		$element->setParent($this);
 		$this->_elements[$element->name] = $element;
@@ -151,13 +161,14 @@ class Fieldset{
 	}
 
 	public function getData() {
-		$data = array();
+		$data = [];
 		foreach ($this->_elements as $element) {
 			if ($element->disabled) {
 				continue;
 			}
 			switch ($element->type) {
-				case 'label':break;
+				case 'label':
+					break;
 				case 'password':
 				case 'file':
 				case 'image':
@@ -221,7 +232,7 @@ class Fieldset{
 		$elements = func_get_args();
 		if (empty($elements)) {
 			$elements = array_keys($this->_elements);
-		} elseif (is_array($elements[0])) {
+		} else if (is_array($elements[0])) {
 			$elements = $elements[0];
 		}
 		$html = '';
@@ -233,17 +244,17 @@ class Fieldset{
 		}
 		return $html;
 	}
-	
+
 	public function renderElement($element) {
 		if (is_string($element)) {
 			$element = $this->getElement($element);
 			if (!$element) {
 				return '';
 			}
-		} elseif (!($element instanceof Element || $element instanceof Fieldset)) {
+		} else if (!($element instanceof Element || $element instanceof Fieldset)) {
 			return '';
 		}
-		if (in_array($element->type, array('hidden')) && !$element->label) {
+		if (in_array($element->type, ['hidden']) && !$element->label) {
 			return $element->render();
 		}
 		$html = '';
@@ -257,12 +268,12 @@ class Fieldset{
 			$cls .= ' field-required';
 		}
 		$html .= '<div class="' . $cls . '">';
-		$renderData = array(
+		$renderData = [
 			'label' => '',
 			'input' => $element->render(),
 			'hint' => ($element->hint ? '<div class="form-element-hint">' . $element->hint . '</div>' : ''),
 			'error' => ($error && is_string($error) ? '<span class="error">' . $error . '</span>' : '')
-		);
+		];
 		if ($element->label) {
 			$renderData['label'] = $element->renderLabel();
 		}
@@ -274,6 +285,6 @@ class Fieldset{
 		$html .= '</div>';
 		return $html;
 	}
-	
-	
+
+
 }
