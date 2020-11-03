@@ -42,15 +42,18 @@ class Form extends AbstractFeildset {
 		return $this;
 	}
 
+	public function setName($method) {
+		return $this->setOption('name', $method);
+	}
+
 	public function setMethod($method) {
 		return $this->setOption('method', $method);
 	}
 
 	public function setData($data) {
 		if (!$this->isSubmitted()) {
-			if ($data instanceof Api) {
+			if ($data instanceof Api)
 				$data = $data->getData();
-			}
 			parent::setData($data);
 		}
 		return $this;
