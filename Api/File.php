@@ -10,6 +10,8 @@ use Exception;
 
 class File extends BaseFile {
 
+	private static $tableParts = 's_files_parts';
+
 	protected $parts = null;
 
 	private function setGuid($guid) {
@@ -112,8 +114,8 @@ class File extends BaseFile {
 
 				Db::insert(self::$tableParts, [
 					'file_id' => $id,
-					'name' => $part->name,
-					'fullname' => $part->fullname,
+					//'name' => $part->name,
+					//'fullname' => $part->fullname,
 					'size' => $part->size,
 					'mtime' => $part->mtime,
 					'index' => $part->index
