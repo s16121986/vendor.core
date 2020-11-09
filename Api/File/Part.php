@@ -26,7 +26,7 @@ class Part extends File{
 		return parent::__get($name);
 	}
 
-	protected function init() {
+	public function init() {
 		$file = $this->file;
 		//$this->_data['extension'] = $file->extension;
 		//$this->_data['path'] = $file->path;

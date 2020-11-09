@@ -5,7 +5,7 @@ namespace Api;
 use Api\File\Util;
 use Db;
 use File as BaseFile;
-use File\Part as FilePart;
+use Api\File\Part as FilePart;
 use Exception;
 
 class File extends BaseFile {
