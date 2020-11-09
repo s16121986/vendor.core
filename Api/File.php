@@ -161,7 +161,6 @@ class File extends BaseFile {
 			->query();
 		while ($r = $q->fetch()) {
 			$part = new FilePart($this, $r);
-			$part->init();
 			$this->parts[$r['index']] = $part;
 		}
 
@@ -176,7 +175,6 @@ class File extends BaseFile {
 			'index' => count($this->parts) + 1,
 			'data' => $content
 		]);
-		$part->init();
 		$this->parts[] = $part;
 
 		return $this;
