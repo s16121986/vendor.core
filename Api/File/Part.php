@@ -32,11 +32,11 @@ class Part extends File{
 		//$this->_data['path'] = $file->path;
 		//$this->_data['mime_type'] = $file->mime_type;
 		$this
-			->_set('basename', $file->basename . self::INDEX_PREFIX . $this->index)
-			->_set('fullname', $this->path . $file->guid . self::INDEX_PREFIX . $this->index);
+			->set('basename', $file->basename . self::INDEX_PREFIX . $this->index)
+			->set('fullname', $this->path . $file->guid . self::INDEX_PREFIX . $this->index);
 		
 		if ($this->basename)
-			$this->_set('name', $this->basename . '.' . $this->extension);
+			$this->set('name', $this->basename . '.' . $this->extension);
 	}
 
 	public function __toString() {
