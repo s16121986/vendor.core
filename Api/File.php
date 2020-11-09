@@ -171,9 +171,7 @@ class File extends BaseFile {
 		if (null === $this->parts)
 			$this->parts = [];
 
-		$part = new FilePart($this, [
-			'index' => count($this->parts) + 1
-		]);
+		$part = new FilePart($this, ['index' => count($this->parts) + 1]);
 		$part->setContent($content);
 		$this->parts[] = $part;
 

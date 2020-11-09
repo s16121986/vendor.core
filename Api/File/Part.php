@@ -32,8 +32,8 @@ class Part extends File {
 		//$this->_data['extension'] = $file->extension;
 		//$this->_data['path'] = $file->path;
 		//$this->_data['mime_type'] = $file->mime_type;
-		$data['basename'] = $file->basename . self::INDEX_PREFIX . $data['index'];
 		$data['fullname'] = $file->path . $file->guid . self::INDEX_PREFIX . $data['index'];
+		$data['basename'] = $file->basename . self::INDEX_PREFIX . $data['index'];
 		$data['name'] = $data['basename'] . '.' . $file->extension;
 
 		return parent::setData($data);
