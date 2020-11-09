@@ -18,6 +18,12 @@ class Part extends File {
 
 	public function __get($name) {
 		switch ($name) {
+			case 'fullname':
+				return $this->file->path . $this->file->guid . self::INDEX_PREFIX . $this->index;
+			case 'basename':
+				return $this->file->basename . self::INDEX_PREFIX . $this->index;
+			case 'name':
+				return $this->file->basename . $this->file->extension;
 			case 'extension':
 			case 'path':
 			case 'mime_type':
@@ -25,18 +31,6 @@ class Part extends File {
 				return $this->file->$name;
 		}
 		return parent::__get($name);
-	}
-
-	public function setData($data) {
-		$file = $this->file;
-		//$this->_data['extension'] = $file->extension;
-		//$this->_data['path'] = $file->path;
-		//$this->_data['mime_type'] = $file->mime_type;
-		$data['fullname'] = $file->path . $file->guid . self::INDEX_PREFIX . $data['index'];
-		$data['basename'] = $file->basename . self::INDEX_PREFIX . $data['index'];
-		$data['name'] = $data['basename'] . '.' . $file->extension;
-
-		return parent::setData($data);
 	}
 
 	public function __toString() {
