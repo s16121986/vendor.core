@@ -1,10 +1,11 @@
 <?php
+
 namespace Api\File;
 
 use File;
 use Api\File as ApiFile;
 
-class Part extends File{
+class Part extends File {
 
 	const INDEX_PREFIX = '_';
 
@@ -26,17 +27,16 @@ class Part extends File{
 		return parent::__get($name);
 	}
 
-	public function init() {
+	public function setData($data) {
 		$file = $this->file;
 		//$this->_data['extension'] = $file->extension;
 		//$this->_data['path'] = $file->path;
 		//$this->_data['mime_type'] = $file->mime_type;
-		$this
-			->set('basename', $file->basename . self::INDEX_PREFIX . $this->index)
-			->set('fullname', $this->path . $file->guid . self::INDEX_PREFIX . $this->index);
-		
-		if ($this->basename)
-			$this->set('name', $this->basename . '.' . $this->extension);
+		$data['basename'] = $file->basename . self::INDEX_PREFIX . $data['index'];
+		$data['fullname'] = $file->path . $file->guid . self::INDEX_PREFIX . $data['index'];
+		$data['name'] = $data['basename'] . '.' . $file->extension;
+
+		return parent::setData($data);
 	}
 
 	public function __toString() {
