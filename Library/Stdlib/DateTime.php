@@ -108,6 +108,36 @@ class DateTime extends BaseDateTime {
 		return parent::format('datetime');
 	}
 
+	public function setYear($year) {
+		$this->setDate($year, $this->getMonth(), $this->getDay());
+		return $this;
+	}
+
+	public function setMonth($month) {
+		$this->setDate($this->getYear(), $month, $this->getDay());
+		return $this;
+	}
+
+	public function setDay($day) {
+		$this->setDate($this->getYear(), $this->getMonth(), $day);
+		return $this;
+	}
+
+	public function setHours($hours) {
+		$this->setTime($hours, $this->getMinute());
+		return $this;
+	}
+
+	public function setMinutes($minutes) {
+		$this->setTime($this->getHour(), $minutes);
+		return $this;
+	}
+
+	public function setSeconds($seconds) {
+		$this->setTime($this->getHour(), $this->getMinute(), $seconds);
+		return $this;
+	}
+
 	public function getYear() {
 		return (int) $this->format('Y');
 	}
