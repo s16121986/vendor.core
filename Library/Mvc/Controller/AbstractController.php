@@ -2,6 +2,8 @@
 
 namespace Mvc\Controller;
 
+use Mvc\Application;
+
 abstract class AbstractController {
 
 	protected $id;
