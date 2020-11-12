@@ -5,7 +5,7 @@ namespace Mvc\Controller;
 abstract class AbstractAction {
 
 	protected $attributes = [];
-	protected $id;
+	protected $uniqueId;
 	protected $controller;
 
 	protected function init() { }
@@ -14,7 +14,7 @@ abstract class AbstractAction {
 		$this->controller = $controller;
 		$this->init();
 		$a = explode('\\', get_class($this));
-		$this->id = strtolower(str_replace('Action', '', array_pop($a)));
+		$this->uniqueId = strtolower(str_replace('Action', '', array_pop($a)));
 	}
 
 	public function __set($name, $value) {

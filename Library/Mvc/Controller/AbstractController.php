@@ -6,7 +6,7 @@ use Mvc\Application;
 
 abstract class AbstractController {
 
-	protected $id;
+	protected $uniqueId;
 	protected $application;
 	protected $data = [];
 
@@ -15,7 +15,7 @@ abstract class AbstractController {
 	public function __construct(Application $application) {
 		$this->application = $application;
 		$a = explode('\\', get_class($this));
-		$this->id = strtolower(str_replace('Controller', '', array_pop($a)));
+		$this->uniqueId = strtolower(str_replace('Controller', '', array_pop($a)));
 		$this->init();
 	}
 
@@ -28,7 +28,7 @@ abstract class AbstractController {
 	}
 
 	public function getId() {
-		return $this->id;
+		return $this->uniqueId;
 	}
 
 	public function get($name) {
