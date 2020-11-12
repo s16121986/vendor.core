@@ -1,6 +1,8 @@
 <?php
 namespace Mvc;
 
+use Mvc\Controller\AbstractController;
+
 class Router{
 	
 	protected $request;
@@ -34,7 +36,7 @@ class Router{
 		return $name;
 	}
 	
-	public function applyController(Controller $controller) {
+	public function applyController(AbstractController $controller) {
 		foreach ($controller->getRoutes() as $route) {
 			if (false !== ($params = $this->_route($route))) {
 				foreach ($params as $n => $v) {
