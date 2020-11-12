@@ -3,6 +3,7 @@
 namespace Mvc\Controller;
 
 use Exception;
+use Mvc\Application;
 use Mvc\Url;
 use Mvc\View;
 
@@ -15,9 +16,13 @@ abstract class AbstractActionController extends AbstractController {
 	protected $url;
 	protected $view;
 
-	protected function init() {
+	public function __construct(Application $application) {
 		$this->url = new Url();
 		$this->view = new View($this);
+		parent::__construct($application);
+	}
+
+	protected function init() {
 		$this->view->setPaths([
 			'@layout' => 'layout'
 		]);

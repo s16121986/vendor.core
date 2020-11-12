@@ -10,13 +10,12 @@ abstract class AbstractController {
 	protected $application;
 	protected $data = [];
 
-	protected function init() {
-		$a = explode('\\', get_class($this));
-		$this->id = strtolower(str_replace('Controller', '', array_pop($a)));
-	}
+	protected function init() { }
 
 	public function __construct(Application $application) {
 		$this->application = $application;
+		$a = explode('\\', get_class($this));
+		$this->id = strtolower(str_replace('Controller', '', array_pop($a)));
 		$this->init();
 	}
 
