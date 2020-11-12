@@ -2,13 +2,15 @@
 
 namespace Mvc;
 
+use Mvc\Controller\AbstractController;
+
 class View {
 
 	protected $attributes = [];
 	protected $controller;
 	protected $paths = [];
 
-	public function __construct(Controller $controller) {
+	public function __construct(AbstractController $controller) {
 		$this->controller = $controller;
 	}
 
