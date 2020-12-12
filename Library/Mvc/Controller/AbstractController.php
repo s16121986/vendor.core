@@ -20,6 +20,11 @@ abstract class AbstractController {
 	}
 
 	public function __get($name) {
+		switch ($name) {
+			case 'application':
+				return $this->$name;
+		}
+
 		return $this->get($name);
 	}
 

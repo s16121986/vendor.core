@@ -22,6 +22,15 @@ abstract class AbstractActionController extends AbstractController {
 		parent::__construct($application);
 	}
 
+	public function __get($name) {
+		switch ($name) {
+			case 'url':
+				return $this->$name;
+		}
+
+		return $this->get($name);
+	}
+
 	protected function init() {
 		$this->view->setPaths([
 			'@layout' => 'layout'
