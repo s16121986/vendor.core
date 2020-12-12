@@ -237,10 +237,10 @@ class Fieldset {
 		}
 		$html = '';
 		foreach ($elements as $k) {
-			if (isset($this->_elements[$k]) && $this->_elements[$k]->render && !$this->_elements[$k]->isRendered()) {
-				$element = $this->_elements[$k];
-				$html .= $this->renderElement($element);
-			}
+			$element = $this->getElement($k);
+			if (!$element || !$element->render || $element->isRendered())
+				continue;
+			$html .= $this->renderElement($element);
 		}
 		return $html;
 	}
