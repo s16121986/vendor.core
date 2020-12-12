@@ -43,17 +43,21 @@ class View {
 
 		extract($attributes);
 		ob_start();
+
+		$viewPath = $this->controller->applicationPath . '/View/';
 		if (0 === strpos($path, '@')) {
-			$viewPath = '';
 			foreach ($this->paths as $n => $v) {
 				if (false === strpos($path, $n))
 					continue;
 				$path = str_replace($n, '', $path);
-				$viewPath = $v;
+				if (0 === strpos($v, '/'))
+					$viewPath = $v;
+				else
+					$viewPath .= $v;
 				break;
 			}
-		} else
-			$viewPath = $this->controller->applicationPath . '/View/';
+		}
+
 		include $viewPath . $path . '.phtml';
 		$content = ob_get_clean();
 		if ($layout) {
