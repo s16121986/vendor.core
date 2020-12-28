@@ -42,8 +42,9 @@ class DateTime extends BaseDateTime {
 	}
 
 	public static function setFormat($alias, $format) {
-		$regexp = '/' . str_replace(array('.', '?', '|'), array('\\.', '\\?', '\\|'), $alias) . '/';
-		self::$formats[$alias] = [$regexp, $format];
+		//$regexp = '/' . str_replace(array('.', '?', '|'), array('\\.', '\\?', '\\|'), $alias) . '/';
+		//self::$formats[$alias] = [$regexp, $format];
+		self::$formats[] = [$alias, $format, '~' . count(self::$formats) . '~'];
 	}
 
 	public static function getFormat($format) {
@@ -70,18 +71,22 @@ class DateTime extends BaseDateTime {
 	}
 
 	public function format($format) {
-		$datetime = $this;
-		foreach (self::$formats as $name => $f) {
-			$callback = $f[1];
-			if (is_callable($callback)) {
-				$format = preg_replace_callback($f[0], function ($matches) use ($name, $datetime, $callback) {
-					return call_user_func($callback, $datetime);
-				}, $format);
-			} else {
-				$format = preg_replace($f[0], $callback, $format);
-			}
+		foreach (self::$formats as $f) {
+			if (is_callable($f[1]))
+				$format = str_replace($f[0], $f[2], $format);
+			else
+				$format = str_replace($f[0], $f[1], $format);
 		}
-		return parent::format($format);
+
+		$format = parent::format($format);
+
+		$datetime = $this;
+		$formats = self::$formats;
+		$format = preg_replace_callback('/~(\d+)~/', function ($matches) use ($datetime, $formats) {
+			return call_user_func($formats[$matches[1]][1], $datetime);
+		}, $format);
+
+		return $format;
 	}
 
 	public function setTimezone($timezone) {
