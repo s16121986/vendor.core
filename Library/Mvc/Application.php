@@ -30,15 +30,17 @@ class Application {
 
 	public function __construct($serviceManager, $request = null, $response = null) {
 		//$serviceManager->set('Application', $this);
+		$config = $serviceManager->get('ApplicationConfig');
 		$this->serviceManager = $serviceManager;
 		$this->request = $request ?: $serviceManager->get('request');
-		$this->response = $response ?: $serviceManager->get('response');
-		$this->applicationPath = $serviceManager->get('ApplicationConfig')->get('applicationPath');
-		$this->applicationNamespace = $serviceManager->get('ApplicationConfig')->get('applicationNamespace');
+		$this->setResponse($response ?? $config->get('response') ?? $serviceManager->get('response'));
+		$this->applicationPath = $config->get('applicationPath');
+		$this->applicationNamespace = $config->get('applicationNamespace');
 	}
 
 	public function get($name) {
 		switch ($name) {
+			case 'serviceManager':
 			case 'applicationPath':
 				return $this->$name;
 			case 'request':
@@ -55,8 +57,26 @@ class Application {
 		return $this->request;
 	}
 
+	public function setRequest($request) {
+		if (is_string($request)) {
+			$cls = 'Mvc\Request\\' . ucfirst($request);
+			$request = new $cls();
+		}
+		$this->request = $request;
+		return $this;
+	}
+
 	public function getResponse() {
 		return $this->response;
+	}
+
+	public function setResponse($response) {
+		if (is_string($response)) {
+			$cls = 'Mvc\Response\\' . ucfirst($response);
+			$response = new $cls();
+		}
+		$this->response = $response;
+		return $this;
 	}
 
 	public function run() {
