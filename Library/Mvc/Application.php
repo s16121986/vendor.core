@@ -136,6 +136,7 @@ class Application {
 			$this->response = $return;
 		else if (null !== $return)
 			$this->response->setData($return);
+
 		return $this->response;
 	}
 
