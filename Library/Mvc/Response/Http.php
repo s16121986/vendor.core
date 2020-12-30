@@ -24,6 +24,10 @@ class Http extends HttpResponse{
 		$this->renderExceptions = $flag;
 		return $this;
 	}
+
+	public function setData($data) {
+		return $this->setContent((string)$data);
+	}
 	
 	public function hasException() {
 		return (bool)$this->exception;

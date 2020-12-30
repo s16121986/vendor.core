@@ -135,7 +135,7 @@ class Application {
 		if ($return instanceof HttpResponse)
 			$this->response = $return;
 		else if (null !== $return)
-			$this->response->setContent($return);
+			$this->response->setData($return);
 		return $this->response;
 	}
 
