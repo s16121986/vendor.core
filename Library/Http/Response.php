@@ -137,7 +137,7 @@ class Response {
 	public function send() {
 		switch ($this->encoding) {
 			default:
-				$content = $this->content;
+				$content = (string)$this->content;
 		}
 		
 		$length = strlen($content);
