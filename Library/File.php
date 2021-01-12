@@ -55,10 +55,10 @@ class File {
 			$this->set('extension', $info['extension']);
 
 		return $this
-						->set('path', $info['dirname'])
-						->set('filename', $info['filename'])
-						->set('name', $info['basename'])
-						->set('fullname', $destination);
+			->set('path', $info['dirname'])
+			->set('filename', $info['filename'])
+			->set('name', $info['basename'])
+			->set('fullname', $destination);
 	}
 
 	public function setName($name) {
@@ -68,8 +68,8 @@ class File {
 			$this->set('extension', $info['extension']);
 
 		return $this
-						->set('filename', $info['filename'])
-						->set('name', $info['basename']);
+			->set('filename', $info['filename'])
+			->set('name', $info['basename']);
 	}
 
 	public function setData($data) {
@@ -109,10 +109,17 @@ class File {
 		if (null !== $this->content)
 			return $this->content;
 
-		if ($this->exists())
-			return file_get_contents($this->fullname);
+		if (!$this->exists())
+			return false;
 
-		return false;
+		$content = '';
+		$h = fopen($this->fullname, 'r');
+		while ($s = fread($h, 1024)) {
+			$content .= $s;
+		}
+		fclose($h);
+
+		return $content;
 	}
 
 	public function hasContent() {
@@ -168,7 +175,7 @@ class File {
 	}
 
 	public function __toString() {
-		return (string) $this->name;
+		return (string)$this->name;
 	}
 
 }
