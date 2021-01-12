@@ -37,7 +37,11 @@ class AttributeFile extends AbstractAttribute {
 			if (!$data->hasContent())
 				return null;
 
-			return new ApiFile($data->getData());
+			$apiFile = new ApiFile($data->getData());
+			if ($data->content)
+				$apiFile->setContent($data->content);
+
+			return $apiFile;
 		} else
 			return null;
 	}

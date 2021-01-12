@@ -66,10 +66,10 @@ class File extends BaseFile {
 		if ($this->isEmpty())
 			return false;
 
-		if (!$this->guid && null === $this->content && $this->exists())
-			$this->setContent($this->getContents());
+		//if (!$this->guid && null === $this->content && $this->exists())
+		//	$this->setContent($this->getContents());
 
-		if (null === $this->content)
+		if (!$this->hasContent())
 			throw new Exception('File content empty');
 
 		$isNew = $this->isNew();
