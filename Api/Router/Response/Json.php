@@ -2,6 +2,8 @@
 
 namespace Api\Router\Response;
 
+use Api\Util\SelectResult;
+
 class Json extends AbstractFormat {
 
 	public function getContent() {
@@ -28,9 +30,11 @@ class Json extends AbstractFormat {
 			foreach ($results as $result) {
 				$data['result'][] = $result->get();
 			}
-		} else {
+		} else if ($result instanceof SelectResult)
+			$data['result'] = $result->toArray();
+		else
 			$data['result'] = $result;
-		}
+
 		return json_encode($data);
 	}
 
