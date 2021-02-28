@@ -1,11 +1,12 @@
 <?php
+
 namespace Auth;
 
-abstract class Util{
+abstract class Util {
 
 	public static function urlencode_rfc3986($input) {
 		if (is_array($input)) {
-			return array_map(array('OAuthUtil', 'urlencode_rfc3986'), $input);
+			return array_map(['OAuthUtil', 'urlencode_rfc3986'], $input);
 		} else if (is_scalar($input)) {
 			return str_replace(
 				'+',
@@ -31,8 +32,8 @@ abstract class Util{
 	// May 28th, 2010 - method updated to tjerk.meesters for a speed improvement.
 	//                  see http://code.google.com/p/oauth/issues/detail?id=163
 	public static function split_header($header, $only_allow_oauth_parameters = false) {
-		$params = array();
-		if (preg_match_all('/('.($only_allow_oauth_parameters ? 'Api' : '').'[a-z_-]*)=(:?"([^"]*)"|([^,]*))/i', $header, $matches)) {
+		$params = [];
+		if (preg_match_all('/(' . ($only_allow_oauth_parameters ? 'Api' : '') . '[a-z_-]*)=(:?"([^"]*)"|([^,]*))/i', $header, $matches)) {
 			foreach ($matches[1] as $i => $h) {
 				$params[$h] = self::urldecode_rfc3986(empty($matches[3][$i]) ? $matches[4][$i] : $matches[3][$i]);
 			}
@@ -42,28 +43,28 @@ abstract class Util{
 		}
 		return $params;
 	}
-	
+
 	public static function getHeader($header) {
-        $temp = 'HTTP_' . strtoupper(str_replace('-', '_', $header));
-        if (isset($_SERVER[$temp]) && $_SERVER[$temp])
-            return $_SERVER[$temp];
+		$temp = 'HTTP_' . strtoupper(str_replace('-', '_', $header));
+		if (isset($_SERVER[$temp]) && $_SERVER[$temp])
+			return $_SERVER[$temp];
 		if (isset($_SERVER['REDIRECT_' . $temp]) && $_SERVER['REDIRECT_' . $temp])
 			return $_SERVER['REDIRECT_' . $temp];
 
-        // This seems to be the only way to get the Authorization header on
-        // Apache
-        if (function_exists('apache_request_headers')) {
-            $headers = apache_request_headers();
+		// This seems to be the only way to get the Authorization header on
+		// Apache
+		if (function_exists('apache_request_headers')) {
+			$headers = apache_request_headers();
 			$header = strtolower($header);
 			foreach ($headers as $k => $v) {
 				if (strtolower($k) == $header) {
 					return $v;
 				}
 			}
-        }
-        return false;
-    }
-	
+		}
+		return false;
+	}
+
 	public static function getUserAgent() {
 		return (isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '');
 	}
@@ -74,10 +75,27 @@ abstract class Util{
 			$ip = $_SERVER['HTTP_CLIENT_IP'];
 		} else if ($checkProxy && isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != null) {
 			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		} elseif (isset($_SERVER['REMOTE_ADDR'])) {
+		} else if (isset($_SERVER['REMOTE_ADDR'])) {
 			$ip = $_SERVER['REMOTE_ADDR'];
 		}
 		return $ip;
 	}
-	
+
+	public static function getAcceptLanguages() {
+		$acceptLanguage = self::getHeader('Accept-Language');
+		if (!$acceptLanguage)
+			return [];
+
+		if (!preg_match_all('/([a-z]{1,8}(?:-[a-z]{1,8})?)(?:;q=([0-9.]+))?/', $acceptLanguage, $list))
+			return [];
+
+		$languages = [];
+		$array = array_combine($list[1], $list[2]);
+		foreach ($array as $n => $v) {
+			$languages[$n] = $v ?: 1;
+		}
+		arsort($languages, SORT_NUMERIC);
+		return array_keys($languages);
+	}
+
 }
