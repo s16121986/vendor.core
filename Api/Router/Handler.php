@@ -123,6 +123,10 @@ class Handler {
 		return $this->_path('delete', func_get_args());
 	}
 
+	public function head() {
+		return $this->_path('head', func_get_args());
+	}
+
 	protected function trigger($event) {
 		foreach ($this->handlers as $handler) {
 			if ($handler[0] !== $event)
