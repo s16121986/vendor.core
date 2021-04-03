@@ -52,9 +52,10 @@ abstract class AbstractProvider {
 			case 'provider':
 				return $this->$name;
 		}
-		if (isset($this->config[$name])) {
+
+		if (isset($this->config[$name]))
 			return $this->config[$name];
-		}
+
 		return (isset($this->params[$name]) ? $this->params[$name] : null);
 	}
 

@@ -5,17 +5,17 @@ namespace Auth\Provider\Providers;
 use Exception;
 use Auth\Provider\Response;
 
-class OAuth2 extends AbstractProvider{
-	
+class OAuth2 extends AbstractProvider {
+
 	const AUTH_TYPE_CODE = 'code';
 	const AUTH_TYPE_BEARER = 'bearer';
 
 	protected $api_auth_type = 'code';
 	protected $authorize_url = "";
-	protected $authorize_params = array();
+	protected $authorize_params = [];
 	protected $token_url = "";
 	protected $token_info_url = "";
-	
+
 	protected $sign_token_name = "access_token";
 	protected $access_token = "";
 	protected $refresh_token = "";
@@ -27,11 +27,12 @@ class OAuth2 extends AbstractProvider{
 	protected $curl_connect_time_out = 30;
 	protected $curl_ssl_verifypeer = false;
 	protected $curl_ssl_verifyhost = false;
-	protected $curl_header = array();
+	protected $curl_header = [];
 	protected $curl_useragent = "OAuth/2 Simple PHP Client v0.1.1; HybridAuth http://hybridauth.sourceforge.net/";
 	protected $curl_authenticate_method = "POST";
 	protected $curl_proxy = null;
 	protected $curl_compressed = false;
+
 	//--
 
 	protected function init() {
@@ -48,23 +49,31 @@ class OAuth2 extends AbstractProvider{
 		  $this->api->curl_proxy = Hybrid_Auth::$config["proxy"];
 		  } */
 	}
-	
+
 	public function __get($name) {
+		if (isset($this->config[$name]))
+			return $this->config[$name];
+
 		switch ($name) {
-			case 'client_id':return $this->id;
-			case 'client_key':return $this->key;
-			case 'client_secret':return $this->secret;
-			case 'redirect_uri':return $this->endpoint;
+			case 'client_id':
+				return $this->id;
+			case 'client_key':
+				return $this->key;
+			case 'client_secret':
+				return $this->secret;
+			case 'redirect_uri':
+				return $this->endpoint;
 		}
+
 		return parent::__get($name);
 	}
 
-	public function authorizeUrl($extras = array()) {
-		$params = array(
+	public function authorizeUrl($extras = []) {
+		$params = [
 			"client_id" => $this->client_id,
 			"redirect_uri" => $this->redirect_uri,
 			"response_type" => "code"
-		);
+		];
 
 		if (count($extras))
 			foreach ($extras as $k => $v)
@@ -77,16 +86,16 @@ class OAuth2 extends AbstractProvider{
 	}
 
 	public function _authenticate($code) {
-		$params = array(
+		$params = [
 			"client_id" => $this->client_id,
 			'scope' => $this->scope,
 			"client_secret" => $this->client_secret,
 			"grant_type" => "authorization_code",
 			"redirect_uri" => $this->redirect_uri,
 			"code" => $code
-		);
+		];
 		$response = $this->request($this->token_url, $params, $this->curl_authenticate_method);
-		
+
 		if (!$response->access_token) {
 			throw new Exception("The Authorization Service has return: " . json_encode($response->error));
 		}
@@ -97,7 +106,7 @@ class OAuth2 extends AbstractProvider{
 	public function isAuthorized() {
 		if (parent::isAuthorized()) {
 			return true;
-		} elseif ($this->access_token) {
+		} else if ($this->access_token) {
 			if ($this->token_info_url && $this->refresh_token) {
 				// check if this access token has expired,
 				$tokeninfo = $this->tokenInfo($this->access_token);
@@ -114,11 +123,11 @@ class OAuth2 extends AbstractProvider{
 	/**
 	 * Format and sign an oauth for provider api
 	 */
-	public function api($url, $method = "GET", $parameters = array()) {
+	public function api($url, $method = "GET", $parameters = []) {
 		if (strrpos($url, 'http://') !== 0 && strrpos($url, 'https://') !== 0) {
 			$url = $this->api_base_url . $url;
 		}
-		$headers = array();
+		$headers = [];
 		switch ($this->api_auth_type) {
 			case 'code':
 				$parameters[$this->sign_token_name] = $this->access_token;
@@ -127,13 +136,15 @@ class OAuth2 extends AbstractProvider{
 				$headers[] = 'Authorization: Bearer ' . $this->access_token;
 				break;
 		}
-		
+
 		$response = null;
 
 		switch ($method) {
-			case 'GET' : $response = $this->request($url, $parameters, "GET", $headers);
+			case 'GET' :
+				$response = $this->request($url, $parameters, "GET", $headers);
 				break;
-			case 'POST' : $response = $this->request($url, $parameters, "POST", $headers);
+			case 'POST' :
+				$response = $this->request($url, $parameters, "POST", $headers);
 				break;
 		}
 		return $this->response = $response;
@@ -143,11 +154,11 @@ class OAuth2 extends AbstractProvider{
 		return $this->response;
 	}
 
-	public function get($url, $parameters = array()) {
+	public function get($url, $parameters = []) {
 		return $this->api($url, 'GET', $parameters);
 	}
 
-	public function post($url, $parameters = array()) {
+	public function post($url, $parameters = []) {
 		return $this->api($url, 'POST', $parameters);
 	}
 
@@ -169,17 +180,17 @@ class OAuth2 extends AbstractProvider{
 
 				// expired?
 				if ($this->access_token_expires_at <= time()) {
-					$params = array(
+					$params = [
 						"client_id" => $this->client_id,
 						"client_secret" => $this->client_secret,
 						"grant_type" => "refresh_token",
 						"refresh_token" => $this->refresh_token
-					);
+					];
 					$response = $this->request($this->token_url, $params, "POST");
 					if (!$response->access_token) {
 						// set the user as disconnected at this point and throw an exception
 						$this->setAuthorized(false);
-						throw new Exception("The Authorization Service has return an invalid response while requesting a new access token. " . (string) $response->error);
+						throw new Exception("The Authorization Service has return an invalid response while requesting a new access token. " . (string)$response->error);
 					}
 
 					// set new access_token
@@ -192,8 +203,8 @@ class OAuth2 extends AbstractProvider{
 	// -- utilities
 
 	protected function loginBegin() {
-		$params = array("access_type" => "offline");
-		$optionals = array("scope", "access_type", "redirect_uri", "approval_prompt", "hd", "state");
+		$params = ["access_type" => "offline"];
+		$optionals = ["scope", "access_type", "redirect_uri", "approval_prompt", "hd", "state"];
 
 		foreach ($optionals as $param) {
 			if ($this->$param) {
@@ -233,9 +244,9 @@ class OAuth2 extends AbstractProvider{
 		// set user connected locally
 	}
 
-	private function request($url, $params = false, $type = "GET", $headers = array()) {
+	private function request($url, $params = false, $type = "GET", $headers = []) {
 		if ($type == "GET") {
-			$url = $url . ( strpos($url, '?') ? '&' : '?' ) . http_build_query($params, '', '&');
+			$url = $url . (strpos($url, '?') ? '&' : '?') . http_build_query($params, '', '&');
 		}
 		$ch = curl_init();
 
@@ -274,7 +285,7 @@ class OAuth2 extends AbstractProvider{
 		curl_close($ch);
 		return $response;
 	}
-	
+
 	private function storeToken($response = null) {
 		if ($response) {
 			$this->access_token = $response->access_token;

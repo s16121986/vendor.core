@@ -1,4 +1,5 @@
 <?php
+
 namespace Auth;
 
 use Db;
@@ -7,12 +8,12 @@ use Auth\User\Password;
 use Auth\Provider\Profile as AuthProfile;
 use Auth\Exception;
 
-class User{
-	
-	protected $options = array(
+class User {
+
+	protected $options = [
 		'enableSocial' => false,
 		'oauth' => 'user_social_ref'
-	);
+	];
 	protected $storage = null;
 	protected $token = null;
 	protected $password = null;
@@ -35,7 +36,7 @@ class User{
 			return false;
 		return true;
 	}
-	
+
 	public function __construct($options = null) {
 		if (is_array($options)) {
 			foreach ($options as $k => $v) {
@@ -43,11 +44,15 @@ class User{
 			}
 		}
 	}
-	
+
 	public function __set($name, $value) {
 		switch ($name) {
-			case 'storage':$this->setStorage($value);break;
-			case 'source':$this->setSource($value);break;
+			case 'storage':
+				$this->setStorage($value);
+				break;
+			case 'source':
+				$this->setSource($value);
+				break;
 			case 'password':
 				if ($value instanceof Password) {
 					$this->password = $value;
@@ -58,24 +63,25 @@ class User{
 		}
 		$this->options[$name] = $value;
 	}
-	
+
 	public function __get($name) {
 		switch ($name) {
 			case 'id':
 			case 'source':
 				return $this->$name;
 		}
-		if (isset($this->options[$name])) {
+
+		if (isset($this->options[$name]))
 			return $this->options[$name];
-		}
+
 		return (isset($this->data[$name]) ? $this->data[$name] : null);
 	}
-	
+
 	public function setSource($source) {
 		if (is_callable($source)) {
 			$this->source = call_user_func($source);
-		} elseif (is_array($source)) {
-			$callback = function() use ($source) {
+		} else if (is_array($source)) {
+			$callback = function () use ($source) {
 				if (isset($_SERVER['HTTP_HOST']) && isset($source[$_SERVER['HTTP_HOST']])) {
 					return $source[$_SERVER['HTTP_HOST']];
 				}
@@ -83,7 +89,7 @@ class User{
 			};
 			$this->source = call_user_func($callback);
 		} else {
-			$this->source =  $source;
+			$this->source = $source;
 		}
 		return $this;
 	}
@@ -105,29 +111,29 @@ class User{
 	public function getStorage() {
 		return $this->storage;
 	}
-	
+
 	public function getToken() {
 		if (null === $this->token) {
 			$this->token = new Token($this);
 		}
 		return $this->token;
 	}
-	
+
 	public function getPassword() {
 		if (null === $this->password) {
 			$this->password = new Password('md5');
 		}
 		return $this->password;
 	}
-	
+
 	public function getData() {
 		return $this->data;
 	}
-	
+
 	public function setId($userId, $storage = true) {
 		$authRow = Db::from('users', '*')
-						->where('id=?', $userId)
-						->query()->fetchRow();
+			->where('id=?', $userId)
+			->query()->fetchRow();
 		if (empty($authRow)) {
 			//$this->_result->setCode(\AUTH_RESULT_CODE::INCORRECT_IDENTITY);
 		} else {
@@ -141,34 +147,34 @@ class User{
 		}
 		return $this;
 	}
-	
+
 	public function login($data) {
 		if ($this->isAuthorized())
 			return $this;
-		
+
 		if ($data instanceof AuthProfile) {
-			$data = array(
+			$data = [
 				'provider' => $data->provider,
 				'identifier' => $data->identifier
-			);
-		} elseif (!(self::checkData($data, array('login', 'password')) || ($this->enableSocial && self::checkData($data, array('provider', 'identifier'))))) {
+			];
+		} else if (!(self::checkData($data, ['login', 'password']) || ($this->enableSocial && self::checkData($data, ['provider', 'identifier'])))) {
 			$this->exception = new Exception(Exception::INCORRECT_DATA);
 			return false;
 		}
 		if (isset($data['provider'])) {
-			$authRow = Db::from($this->oauth, array('id as oauth_id', 'provider', 'identifier'))
-					->joinInner('users', 'users.id=' . $this->oauth . '.user_id', array('id', 'status'))
-					->where($this->oauth . '.provider=?', $data['provider'])
-					->where($this->oauth . '.identifier=?', $data['identifier'])
-					->query()->fetchRow();
+			$authRow = Db::from($this->oauth, ['id as oauth_id', 'provider', 'identifier'])
+				->joinInner('users', 'users.id=' . $this->oauth . '.user_id', ['id', 'status'])
+				->where($this->oauth . '.provider=?', $data['provider'])
+				->where($this->oauth . '.identifier=?', $data['identifier'])
+				->query()->fetchRow();
 		} else {
 			$authRow = Db::from('users', '*')
-						->where('login=?', $data['login'])
-						->where('password=?', $this->getPassword()->encrypt($data['password']))
-						//->where('status>0')
-						->query()->fetchRow();
+				->where('login=?', $data['login'])
+				->where('password=?', $this->getPassword()->encrypt($data['password']))
+				//->where('status>0')
+				->query()->fetchRow();
 		}
-				
+
 		if (empty($authRow)) {
 			$this->exception = new Exception(Exception::USER_NOT_FOUND);
 			return false;
@@ -182,7 +188,7 @@ class User{
 		//$this->getStorage()->setResult($result, $data, $redirect);
 		return $this;
 	}
-	
+
 	public function logout() {
 		if ($this->isAuthorized()) {
 			$this->getStorage()->clear();
@@ -209,20 +215,18 @@ class User{
 	public function isAuthorized() {
 		return (null !== $this->id);
 	}
-	
+
 	public function isValid() {
 		return (null === $this->exception && $this->isAuthorized());
 	}
-	
+
 	protected function initData() {
 		if (!defined('UserId')) {
 			define('UserId', (int)$this->id);
 		}
 		return $this;
 	}
-	
-	
-	
+
 
 	public function ssoLogin($userId) {
 
@@ -238,5 +242,5 @@ class User{
 
 		return $this->_result;
 	}
-	
+
 }
