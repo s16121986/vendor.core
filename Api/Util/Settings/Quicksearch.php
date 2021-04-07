@@ -66,7 +66,7 @@ class Quicksearch {
 	}
 
 	public function setValue($value) {
-		$this->value = $value;
+		$this->value = trim($value);
 		return $this;
 	}
 
