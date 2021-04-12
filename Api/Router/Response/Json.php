@@ -18,8 +18,8 @@ class Json extends AbstractFormat {
 		];
 		if (!$response->isValid()) {
 			$data['status']['error'] = $response->getErrorCode();
-			//if (($exception = $response->getException()))
-			//	$data['status']['trace'] = $exception->getTraceAsString();
+			if (($exception = $response->getException()))
+				$data['status']['trace'] = $exception->getTraceAsString();
 		}
 		$result = $response->get();
 		$results = $response->getResults();
