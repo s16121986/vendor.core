@@ -100,13 +100,15 @@ class File extends BaseFile {
 		if (!$id)
 			return false;
 
+		$content = $this->getContents(); //store content before change fullname
+
 		$this
 			->set('id', $id)
 			->setGuid($guid);
 
 		Util::checkPath($guid);
 
-		Util::fwrite($this);
+		Util::fwrite($this, $content);
 
 		if ($this->parts) {
 			foreach ($this->parts as $part) {

@@ -132,11 +132,11 @@ abstract class Util {
 		return true;
 	}
 
-	public static function fwrite($file) {
+	public static function fwrite($file, $content = null) {
 		if (false === ($fh = fopen($file->fullname, 'w')))
 			throw new Exception('Cant create file');
 
-		fwrite($fh, $file->getContents());
+		fwrite($fh, $content ?? $file->getContents());
 		fclose($fh);
 
 		self::chmod($file->fullname, 'file');
