@@ -19,7 +19,7 @@ abstract class AbstractCollection extends AbstractXml {
 
 	public function __toString() {
 		$xml = '<?xml version="1.0" encoding="UTF-8"?>' . self::NL;
-		$xml = '<' . $this->tag . '>' . self::NL;
+		$xml .= '<' . $this->tag . '>' . self::NL;
 		foreach ($this->items as $item) {
 			$xml .= (string) $item;
 		}
