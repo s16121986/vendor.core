@@ -43,7 +43,9 @@ class Response extends Result {
 	}
 
 	public function setContentType($type) {
-		if (!isset(self::$contentTypes[$type])) {
+		if ($type === '*' || $type === '*/*')
+			$type = 'json';
+		else if (!isset(self::$contentTypes[$type])) {
 			$type = array_search($type, self::$contentTypes);
 			if (false === $type)
 				throw new Exception('Content type unsupported');
