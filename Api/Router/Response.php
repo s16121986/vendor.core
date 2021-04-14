@@ -2,11 +2,16 @@
 
 namespace Api\Router;
 
+use Exception;
+
 class Response extends Result {
 
-	protected $options = [
-		'format' => 'json'
+	private static $contentTypes = [
+		'json' => 'application/json',
+		'xml' => 'application/xml'
 	];
+
+	protected $contentType = 'json';
 	protected $httpCode = 200;
 	protected $headers = [];
 	protected $results = [];
@@ -37,13 +42,25 @@ class Response extends Result {
 			->setMessage($message);
 	}
 
+	public function setContentType($type) {
+		if (!isset(self::$contentTypes[$type])) {
+			$type = array_search($type, self::$contentTypes);
+			if (false === $type)
+				throw new Exception('Content type unsupported');
+		}
+		$this->contentType = $type;
+
+		return $this;
+	}
+
 	public function send() {
 		header('HTTP/1.1 ' . $this->httpCode);
-		header('Content-Type: application/json');
 		foreach ($this->headers as $header) {
 			header($header);
 		}
-		$format = new Response\Json($this);
+		header('Content-Type: ' . self::$contentTypes[$this->contentType]);
+		$cls = __NAMESPACE__ . '\\Response\\' . ucfirst($this->contentType);
+		$format = new $cls($this);
 		echo $format->getContent();
 	}
 
