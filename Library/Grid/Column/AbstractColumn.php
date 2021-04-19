@@ -1,17 +1,18 @@
 <?php
+
 namespace Grid\Column;
 
-abstract class AbstractColumn{
+abstract class AbstractColumn {
 
-	private static $_default = array(
+	private static $_default = [
 		'order' => false,
 		'text' => '',
 		'emptyText' => ''
-	);
+	];
 
-	protected $_options = array(
+	protected $_options = [
 		'renderer' => false
-	);
+	];
 
 	protected $_grid;
 
@@ -20,12 +21,13 @@ abstract class AbstractColumn{
 	}
 
 	public function __get($name) {
-		if (isset($this->_options[$name])) return $this->_options[$name];
+		if (isset($this->_options[$name]))
+			return $this->_options[$name];
 		//if (isset(self::$_default[$name])) return self::$_default[$name];
 		return null;
 	}
 
-	public function __construct($name, $options = array()) {
+	public function __construct($name, $options = []) {
 		if (!isset($options['id'])) {
 			$options['id'] = 'formfield_' . $name;
 		}
@@ -35,8 +37,9 @@ abstract class AbstractColumn{
 		$options['type'] = strtolower(str_replace('Grid\\Column\\', '', get_class($this)));
 		$options['class'] .= ' column-' . $options['type'];
 		$this->setName($name)
-				->setOptions(array_merge(self::$_default, $this->_options, $options));
+			->setOptions(array_merge(self::$_default, $this->_options, $options));
 
+		$this->init();
 	}
 
 	public function setName($name) {
@@ -59,7 +62,7 @@ abstract class AbstractColumn{
 	public function formatValue($value, $row = null) {
 		return $value;
 	}
-	
+
 	public function prepareValue($value) {
 		return $value;
 	}
@@ -67,20 +70,24 @@ abstract class AbstractColumn{
 	public function render($value, $row) {
 		$value = $this->formatValue($value, $row);
 		if ($this->renderer) {
-			$value = call_user_func_array($this->renderer, array($row, $this->params));
+			$value = call_user_func_array($this->renderer, [$row, $this->params]);
 		}
 		if ($this->renderTpl) {
 			$value = \Format::formatTemplate($this->renderTpl, $row);
 		}
 		if (null === $value || '' === $value)
 			return $this->emptyText;
-		
+
 		//$row['value'] = $value;
 		if ($this->href) {
-			return '<a href="' . \Format::formatTemplate($this->href, $row) . '"' 
+			return '<a href="' . \Format::formatTemplate($this->href, $row) . '"'
 				. ($this->hrefTarget ? ' target="' . $this->hrefTarget . '"' : '') . '>' . $value . '</a>';
 		}
 		return $value;
+	}
+
+	protected function init() {
+
 	}
 
 }
