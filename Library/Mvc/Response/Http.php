@@ -1,23 +1,24 @@
 <?php
+
 namespace Mvc\Response;
 
 use Http\Response as HttpResponse;
 use Http\Util as HttpUtil;
 
-class Http extends HttpResponse{
+class Http extends HttpResponse {
 
 	protected $HTTP_ACCEPT_ENCODING = true;
-    protected $renderExceptions = false;
+	protected $renderExceptions = false;
 	protected $exception = null;
-	
+
 	public function __construct() {
 		$this->init();
 	}
-	
+
 	protected function init() {
 		$this->setHeader('Date', self::gmt(now()->getTimestamp()), true);
 	}
-	
+
 	public function renderExceptions($flag = null) {
 		if (null === $flag)
 			return $this->renderExceptions;
@@ -28,20 +29,20 @@ class Http extends HttpResponse{
 	public function setData($data) {
 		return $this->setContent((string)$data);
 	}
-	
+
 	public function hasException() {
 		return (bool)$this->exception;
 	}
-	
+
 	public function setException($exception) {
 		$this->exception = $exception;
 		return $this;
 	}
-	
+
 	public function getException() {
 		return $this->exception;
 	}
-	
+
 	public function cacheControl($lastModified, $redirect = true) {
 		if (is_array($lastModified)) {
 			$temp = $lastModified;
@@ -66,30 +67,30 @@ class Http extends HttpResponse{
 		$now->modify('+1 month');
 		$this->setHeader('Expires', self::gmt($now->getTimestamp()), true);
 	}
-	
+
 	public function setRedirect($url, $code = 301) {
 		$this
 			->setHeader('Location', $url, true)
-            ->setHttpCode($code)
+			->setHttpCode($code)
 			->sendHeaders();
 		exit;
 	}
 
 	public function send() {
 		if ($this->hasException()) {
-			if ($this->renderExceptions()) {
+			if ($this->renderExceptions())
 				$this->setContent($this->exception->__toString());
-			}
+
 			if (!$this->httpCode)
 				$this->setHttpCode(500);
-		} else {
+		} else if (!$this->httpCode)
 			$this->setHttpCode(200);
-		}
+
 		return parent::send();
 	}
-	
+
 	protected static function gmt($timestamp) {
 		return gmdate('D, d M Y H:i:s', $timestamp) . ' GMT';
 	}
-	
+
 }
