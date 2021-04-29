@@ -832,12 +832,12 @@ class Sender {
 
 			// To capture the complete message when using mail(), create
 			// an extra header list which CreateHeader() doesn't fold in
-			if (count($this->to) > 0)
-				$this->mailHeader .= $this->AddrAppend("To", $this->to);
-			else
-				$this->mailHeader .= $this->HeaderLine("To", "undisclosed-recipients:;");
 
 			if ($this->Mailer == 'mail') {
+				if (count($this->to) > 0)
+					$this->mailHeader .= $this->AddrAppend("To", $this->to);
+				else
+					$this->mailHeader .= $this->HeaderLine("To", "undisclosed-recipients:;");
 				$this->mailHeader .= $this->HeaderLine('Subject', $this->EncodeHeader($this->SecureHeader(trim($this->Subject))));
 			}
 
@@ -1412,18 +1412,16 @@ class Sender {
 			$result .= $this->HeaderLine('Return-Path', '<' . trim($this->Sender) . '>');
 		}
 
+		if (count($this->to) > 0)
+			$result .= $this->AddrAppend('To', $this->to);
+		else if (count($this->cc) == 0)
+			$result .= $this->HeaderLine('To', 'undisclosed-recipients:;');
+
 		// To be created automatically by mail()
 		if ($this->Mailer != 'mail') {
 			if ($this->SingleTo === true) {
 				foreach ($this->to as $t) {
 					$this->SingleToArray[] = $this->AddrFormat($t);
-				}
-			} else {
-				/*if (count($this->to) > 0) {
-					$result .= $this->AddrAppend('To', $this->to);
-				} else*/
-				if (count($this->cc) == 0) {
-					$result .= $this->HeaderLine('To', 'undisclosed-recipients:;');
 				}
 			}
 		}
