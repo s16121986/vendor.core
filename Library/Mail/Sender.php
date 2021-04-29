@@ -9,6 +9,7 @@ use Exception;
  * @package PHPMailer
  */
 class Sender {
+
 	/////////////////////////////////////////////////
 	// PROPERTIES, PUBLIC
 	/////////////////////////////////////////////////
@@ -238,19 +239,19 @@ class Sender {
 
 	/**
 	 *  Sets SMTP auth type. Options are LOGIN | PLAIN | NTLM | CRAM-MD5 (default LOGIN)
-	 *  @var string
+	 * @var string
 	 */
 	public $AuthType = '';
 
 	/**
 	 *  Sets SMTP realm.
-	 *  @var string
+	 * @var string
 	 */
 	public $Realm = '';
 
 	/**
 	 *  Sets SMTP workstation.
-	 *  @var string
+	 * @var string
 	 */
 	public $Workstation = '';
 
@@ -300,7 +301,7 @@ class Sender {
 	 * If SingleTo is true, this provides the array to hold the email addresses
 	 * @var bool
 	 */
-	public $SingleToArray = array();
+	public $SingleToArray = [];
 
 	/**
 	 * Should we allow sending messages with empty body?
@@ -402,43 +403,43 @@ class Sender {
 	 * @var array An array of 'to' addresses
 	 * @access protected
 	 */
-	protected $to = array();
+	protected $to = [];
 
 	/**
 	 * @var array An array of 'cc' addresses
 	 * @access protected
 	 */
-	protected $cc = array();
+	protected $cc = [];
 
 	/**
 	 * @var array An array of 'bcc' addresses
 	 * @access protected
 	 */
-	protected $bcc = array();
+	protected $bcc = [];
 
 	/**
 	 * @var array An array of reply-to name and address
 	 * @access protected
 	 */
-	protected $ReplyTo = array();
+	protected $ReplyTo = [];
 
 	/**
 	 * @var array An array of all kinds of addresses: to, cc, bcc, replyto
 	 * @access protected
 	 */
-	protected $all_recipients = array();
+	protected $all_recipients = [];
 
 	/**
 	 * @var array An array of attachments
 	 * @access protected
 	 */
-	protected $attachment = array();
+	protected $attachment = [];
 
 	/**
 	 * @var array An array of custom headers
 	 * @access protected
 	 */
-	protected $CustomHeader = array();
+	protected $CustomHeader = [];
 
 	/**
 	 * @var string The message's MIME type
@@ -450,13 +451,13 @@ class Sender {
 	 * @var array An array of MIME boundary strings
 	 * @access protected
 	 */
-	protected $boundary = array();
+	protected $boundary = [];
 
 	/**
 	 * @var array An array of available languages
 	 * @access protected
 	 */
-	protected $language = array();
+	protected $language = [];
 
 	/**
 	 * @var integer The number of errors encountered
@@ -495,7 +496,7 @@ class Sender {
 	const STOP_MESSAGE = 0; // message only, continue processing
 	const STOP_CONTINUE = 1; // message?, likely ok to continue processing
 	const STOP_CRITICAL = 2; // message, plus full stop, critical error reached
-	const CRLF = "\r\n";	 // SMTP RFC specified EOL
+	const CRLF = "\r\n";     // SMTP RFC specified EOL
 
 	protected static $defaults = [];
 
@@ -675,9 +676,9 @@ class Sender {
 	 * @param string $kind One of 'to', 'cc', 'bcc', 'ReplyTo'
 	 * @param string $address The email address to send to
 	 * @param string $name
-	 * @throws Exception
 	 * @return boolean true on success, false if address already used or invalid in some way
 	 * @access protected
+	 * @throws Exception
 	 */
 	protected function AddAnAddress($kind, $address, $name = '') {
 		if (!preg_match('/^(to|cc|bcc|Reply-To)$/', $kind)) {
@@ -704,13 +705,13 @@ class Sender {
 		}
 		if ($kind != 'Reply-To') {
 			if (!isset($this->all_recipients[strtolower($address)])) {
-				array_push($this->$kind, array($address, $name));
+				array_push($this->$kind, [$address, $name]);
 				$this->all_recipients[strtolower($address)] = true;
 				return true;
 			}
 		} else {
 			if (!array_key_exists(strtolower($address), $this->ReplyTo)) {
-				$this->ReplyTo[strtolower($address)] = array($address, $name);
+				$this->ReplyTo[strtolower($address)] = [$address, $name];
 				return true;
 			}
 		}
@@ -722,8 +723,8 @@ class Sender {
 	 * @param string $address
 	 * @param string $name
 	 * @param boolean $auto Whether to also set the Sender address, defaults to true
-	 * @throws Exception
 	 * @return boolean
+	 * @throws Exception
 	 */
 	public function SetFrom($address, $name = '', $auto = true) {
 		$address = trim($address);
@@ -764,10 +765,10 @@ class Sender {
 	public static function ValidateAddress($address) {
 		if (defined('PCRE_VERSION')) { //Check this instead of extension_loaded so it works when that function is disabled
 			if (version_compare(PCRE_VERSION, '8.0') >= 0) {
-				return (boolean) preg_match('/^(?!(?>(?1)"?(?>\\\[ -~]|[^"])"?(?1)){255,})(?!(?>(?1)"?(?>\\\[ -~]|[^"])"?(?1)){65,}@)((?>(?>(?>((?>(?>(?>\x0D\x0A)?[\t ])+|(?>[\t ]*\x0D\x0A)?[\t ]+)?)(\((?>(?2)(?>[\x01-\x08\x0B\x0C\x0E-\'*-\[\]-\x7F]|\\\[\x00-\x7F]|(?3)))*(?2)\)))+(?2))|(?2))?)([!#-\'*+\/-9=?^-~-]+|"(?>(?2)(?>[\x01-\x08\x0B\x0C\x0E-!#-\[\]-\x7F]|\\\[\x00-\x7F]))*(?2)")(?>(?1)\.(?1)(?4))*(?1)@(?!(?1)[a-z0-9-]{64,})(?1)(?>([a-z0-9](?>[a-z0-9-]*[a-z0-9])?)(?>(?1)\.(?!(?1)[a-z0-9-]{64,})(?1)(?5)){0,126}|\[(?:(?>IPv6:(?>([a-f0-9]{1,4})(?>:(?6)){7}|(?!(?:.*[a-f0-9][:\]]){8,})((?6)(?>:(?6)){0,6})?::(?7)?))|(?>(?>IPv6:(?>(?6)(?>:(?6)){5}:|(?!(?:.*[a-f0-9]:){6,})(?8)?::(?>((?6)(?>:(?6)){0,4}):)?))?(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?>\.(?9)){3}))\])(?1)$/isD', $address);
+				return (boolean)preg_match('/^(?!(?>(?1)"?(?>\\\[ -~]|[^"])"?(?1)){255,})(?!(?>(?1)"?(?>\\\[ -~]|[^"])"?(?1)){65,}@)((?>(?>(?>((?>(?>(?>\x0D\x0A)?[\t ])+|(?>[\t ]*\x0D\x0A)?[\t ]+)?)(\((?>(?2)(?>[\x01-\x08\x0B\x0C\x0E-\'*-\[\]-\x7F]|\\\[\x00-\x7F]|(?3)))*(?2)\)))+(?2))|(?2))?)([!#-\'*+\/-9=?^-~-]+|"(?>(?2)(?>[\x01-\x08\x0B\x0C\x0E-!#-\[\]-\x7F]|\\\[\x00-\x7F]))*(?2)")(?>(?1)\.(?1)(?4))*(?1)@(?!(?1)[a-z0-9-]{64,})(?1)(?>([a-z0-9](?>[a-z0-9-]*[a-z0-9])?)(?>(?1)\.(?!(?1)[a-z0-9-]{64,})(?1)(?5)){0,126}|\[(?:(?>IPv6:(?>([a-f0-9]{1,4})(?>:(?6)){7}|(?!(?:.*[a-f0-9][:\]]){8,})((?6)(?>:(?6)){0,6})?::(?7)?))|(?>(?>IPv6:(?>(?6)(?>:(?6)){5}:|(?!(?:.*[a-f0-9]:){6,})(?8)?::(?>((?6)(?>:(?6)){0,4}):)?))?(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?>\.(?9)){3}))\])(?1)$/isD', $address);
 			} else {
 				//Fall back to an older regex that doesn't need a recent PCRE
-				return (boolean) preg_match('/^(?!(?>"?(?>\\\[ -~]|[^"])"?){255,})(?!(?>"?(?>\\\[ -~]|[^"])"?){65,}@)(?>[!#-\'*+\/-9=?^-~-]+|"(?>(?>[\x01-\x08\x0B\x0C\x0E-!#-\[\]-\x7F]|\\\[\x00-\xFF]))*")(?>\.(?>[!#-\'*+\/-9=?^-~-]+|"(?>(?>[\x01-\x08\x0B\x0C\x0E-!#-\[\]-\x7F]|\\\[\x00-\xFF]))*"))*@(?>(?![a-z0-9-]{64,})(?>[a-z0-9](?>[a-z0-9-]*[a-z0-9])?)(?>\.(?![a-z0-9-]{64,})(?>[a-z0-9](?>[a-z0-9-]*[a-z0-9])?)){0,126}|\[(?:(?>IPv6:(?>(?>[a-f0-9]{1,4})(?>:[a-f0-9]{1,4}){7}|(?!(?:.*[a-f0-9][:\]]){8,})(?>[a-f0-9]{1,4}(?>:[a-f0-9]{1,4}){0,6})?::(?>[a-f0-9]{1,4}(?>:[a-f0-9]{1,4}){0,6})?))|(?>(?>IPv6:(?>[a-f0-9]{1,4}(?>:[a-f0-9]{1,4}){5}:|(?!(?:.*[a-f0-9]:){6,})(?>[a-f0-9]{1,4}(?>:[a-f0-9]{1,4}){0,4})?::(?>(?:[a-f0-9]{1,4}(?>:[a-f0-9]{1,4}){0,4}):)?))?(?>25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?>\.(?>25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}))\])$/isD', $address);
+				return (boolean)preg_match('/^(?!(?>"?(?>\\\[ -~]|[^"])"?){255,})(?!(?>"?(?>\\\[ -~]|[^"])"?){65,}@)(?>[!#-\'*+\/-9=?^-~-]+|"(?>(?>[\x01-\x08\x0B\x0C\x0E-!#-\[\]-\x7F]|\\\[\x00-\xFF]))*")(?>\.(?>[!#-\'*+\/-9=?^-~-]+|"(?>(?>[\x01-\x08\x0B\x0C\x0E-!#-\[\]-\x7F]|\\\[\x00-\xFF]))*"))*@(?>(?![a-z0-9-]{64,})(?>[a-z0-9](?>[a-z0-9-]*[a-z0-9])?)(?>\.(?![a-z0-9-]{64,})(?>[a-z0-9](?>[a-z0-9-]*[a-z0-9])?)){0,126}|\[(?:(?>IPv6:(?>(?>[a-f0-9]{1,4})(?>:[a-f0-9]{1,4}){7}|(?!(?:.*[a-f0-9][:\]]){8,})(?>[a-f0-9]{1,4}(?>:[a-f0-9]{1,4}){0,6})?::(?>[a-f0-9]{1,4}(?>:[a-f0-9]{1,4}){0,6})?))|(?>(?>IPv6:(?>[a-f0-9]{1,4}(?>:[a-f0-9]{1,4}){5}:|(?!(?:.*[a-f0-9]:){6,})(?>[a-f0-9]{1,4}(?>:[a-f0-9]{1,4}){0,4})?::(?>(?:[a-f0-9]{1,4}(?>:[a-f0-9]{1,4}){0,4}):)?))?(?>25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?>\.(?>25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}))\])$/isD', $address);
 			}
 		} else {
 			//No PCRE! Do something _very_ approximate!
@@ -784,8 +785,8 @@ class Sender {
 	 * Creates message and assigns Mailer. If the message is
 	 * not sent successfully then it returns false.  Use the ErrorInfo
 	 * variable to view description of the error.
-	 * @throws Exception
 	 * @return bool
+	 * @throws Exception
 	 */
 	public function Send() {
 		try {
@@ -804,8 +805,8 @@ class Sender {
 
 	/**
 	 * Prep mail by constructing all message entities
-	 * @throws Exception
 	 * @return bool
+	 * @throws Exception
 	 */
 	public function PreSend() {
 		try {
@@ -831,12 +832,12 @@ class Sender {
 
 			// To capture the complete message when using mail(), create
 			// an extra header list which CreateHeader() doesn't fold in
+			if (count($this->to) > 0)
+				$this->mailHeader .= $this->AddrAppend("To", $this->to);
+			else
+				$this->mailHeader .= $this->HeaderLine("To", "undisclosed-recipients:;");
+
 			if ($this->Mailer == 'mail') {
-				if (count($this->to) > 0) {
-					$this->mailHeader .= $this->AddrAppend("To", $this->to);
-				} else {
-					$this->mailHeader .= $this->HeaderLine("To", "undisclosed-recipients:;");
-				}
 				$this->mailHeader .= $this->HeaderLine('Subject', $this->EncodeHeader($this->SecureHeader(trim($this->Subject))));
 			}
 
@@ -859,8 +860,8 @@ class Sender {
 	/**
 	 * Actual Email transport function
 	 * Send the email via the selected mechanism
-	 * @throws Exception
 	 * @return bool
+	 * @throws Exception
 	 */
 	public function PostSend() {
 		try {
@@ -891,9 +892,9 @@ class Sender {
 	 * Sends mail using the $Sendmail program.
 	 * @param string $header The message headers
 	 * @param string $body The message body
+	 * @return bool
 	 * @throws Exception
 	 * @access protected
-	 * @return bool
 	 */
 	protected function SendmailSend($header, $body) {
 		if ($this->Sender != '') {
@@ -938,12 +939,12 @@ class Sender {
 	 * Sends mail using the PHP mail() function.
 	 * @param string $header The message headers
 	 * @param string $body The message body
+	 * @return bool
 	 * @throws Exception
 	 * @access protected
-	 * @return bool
 	 */
 	protected function MailSend($header, $body) {
-		$toArr = array();
+		$toArr = [];
 		foreach ($this->to as $t) {
 			$toArr[] = $this->AddrFormat($t);
 		}
@@ -954,7 +955,7 @@ class Sender {
 		} else {
 			$params = sprintf("-f%s", $this->Sender);
 		}
-		if ($this->Sender != '' and ! ini_get('safe_mode')) {
+		if ($this->Sender != '' and !ini_get('safe_mode')) {
 			$old_from = ini_get('sendmail_from');
 			ini_set('sendmail_from', $this->Sender);
 		}
@@ -986,14 +987,14 @@ class Sender {
 	 * Returns false if there is a bad MAIL FROM, RCPT, or DATA input.
 	 * @param string $header The message headers
 	 * @param string $body The message body
+	 * @return bool
 	 * @throws Exception
 	 * @uses SMTP
 	 * @access protected
-	 * @return bool
 	 */
 	protected function SmtpSend($header, $body) {
 		require_once $this->PluginDir . 'class.smtp.php';
-		$bad_rcpt = array();
+		$bad_rcpt = [];
 
 		if (!$this->SmtpConnect()) {
 			throw new Exception($this->Lang('smtp_connect_failed'), self::STOP_CRITICAL);
@@ -1063,12 +1064,12 @@ class Sender {
 	 * Initiates a connection to an SMTP server.
 	 * Returns false if the operation failed.
 	 * @param array $options An array of options compatible with stream_context_create()
+	 * @return bool
+	 * @throws Exception
 	 * @uses SMTP
 	 * @access public
-	 * @throws Exception
-	 * @return bool
 	 */
-	public function SmtpConnect($options = array()) {
+	public function SmtpConnect($options = []) {
 		if (is_null($this->smtp)) {
 			$this->smtp = new \SMTP;
 		}
@@ -1089,7 +1090,7 @@ class Sender {
 		$lastexception = null;
 
 		foreach ($hosts as $hostentry) {
-			$hostinfo = array();
+			$hostinfo = [];
 			$host = $hostentry;
 			$port = $this->Port;
 			if (preg_match('/^(.+):([0-9]+)$/', $hostentry, $hostinfo)) { //If $hostentry contains 'address:port', override default
@@ -1128,7 +1129,7 @@ class Sender {
 		//If we get here, all connection attempts have failed, so close connection hard
 		$this->smtp->Close();
 		//As we've caught all exceptions, just report whatever the last one was
-		if ($this->exceptions and ! is_null($lastexception)) {
+		if ($this->exceptions and !is_null($lastexception)) {
 			throw $lastexception;
 		}
 		return false;
@@ -1157,7 +1158,7 @@ class Sender {
 	 */
 	function SetLanguage($langcode = 'en', $lang_path = 'language/') {
 		//Define full set of translatable strings
-		$PHPMAILER_LANG = array(
+		$PHPMAILER_LANG = [
 			'authenticate' => 'SMTP Error: Could not authenticate.',
 			'connect_host' => 'SMTP Error: Could not connect to SMTP host.',
 			'data_not_accepted' => 'SMTP Error: Data not accepted.',
@@ -1176,7 +1177,7 @@ class Sender {
 			'smtp_connect_failed' => 'SMTP Connect() failed.',
 			'smtp_error' => 'SMTP server error: ',
 			'variable_set' => 'Cannot set or reset variable: '
-		);
+		];
 		//Overwrite language-specific strings. This way we'll never have missing translations - no more "language string failed to load"!
 		$l = true;
 		if ($langcode != 'en') { //There is no English translation file
@@ -1207,7 +1208,7 @@ class Sender {
 	 */
 	public function AddrAppend($type, $addr) {
 		$addr_str = $type . ': ';
-		$addresses = array();
+		$addresses = [];
 		foreach ($addr as $a) {
 			$addresses[] = $this->AddrFormat($a);
 		}
@@ -1261,16 +1262,16 @@ class Sender {
 			$buf = '';
 			for ($e = 0; $e < count($line_part); $e++) {
 				$word = $line_part[$e];
-				if ($qp_mode and ( strlen($word) > $length)) {
+				if ($qp_mode and (strlen($word) > $length)) {
 					$space_left = $length - strlen($buf) - $crlflen;
 					if ($e != 0) {
 						if ($space_left > 20) {
 							$len = $space_left;
 							if ($is_utf8) {
 								$len = $this->UTF8CharBoundary($word, $len);
-							} elseif (substr($word, $len - 1, 1) == "=") {
+							} else if (substr($word, $len - 1, 1) == "=") {
 								$len--;
-							} elseif (substr($word, $len - 2, 1) == "=") {
+							} else if (substr($word, $len - 2, 1) == "=") {
 								$len -= 2;
 							}
 							$part = substr($word, 0, $len);
@@ -1289,9 +1290,9 @@ class Sender {
 						$len = $length;
 						if ($is_utf8) {
 							$len = $this->UTF8CharBoundary($word, $len);
-						} elseif (substr($word, $len - 1, 1) == "=") {
+						} else if (substr($word, $len - 1, 1) == "=") {
 							$len--;
-						} elseif (substr($word, $len - 2, 1) == "=") {
+						} else if (substr($word, $len - 2, 1) == "=") {
 							$len -= 2;
 						}
 						$part = substr($word, 0, $len);
@@ -1325,7 +1326,7 @@ class Sender {
 	 * Original written by Colin Brown.
 	 * @access public
 	 * @param string $encodedText utf-8 QP text
-	 * @param int    $maxLength   find last character boundary prior to this length
+	 * @param int $maxLength find last character boundary prior to this length
 	 * @return int
 	 */
 	public function UTF8CharBoundary($encodedText, $maxLength) {
@@ -1343,13 +1344,13 @@ class Sender {
 					// If the encoded char was found at pos 0, it will fit
 					// otherwise reduce maxLength to start of the encoded char
 					$maxLength = ($encodedCharPos == 0) ? $maxLength :
-							$maxLength - ($lookBack - $encodedCharPos);
+						$maxLength - ($lookBack - $encodedCharPos);
 					$foundSplitPos = true;
-				} elseif ($dec >= 192) { // First byte of a multi byte character
+				} else if ($dec >= 192) { // First byte of a multi byte character
 					// Reduce maxLength to split at start of character
 					$maxLength = $maxLength - ($lookBack - $encodedCharPos);
 					$foundSplitPos = true;
-				} elseif ($dec < 192) { // Middle byte of a multi byte character, look further back
+				} else if ($dec < 192) { // Middle byte of a multi byte character, look further back
 					$lookBack += 3;
 				}
 			} else {
@@ -1405,7 +1406,7 @@ class Sender {
 
 		if ($this->ReturnPath) {
 			$result .= $this->HeaderLine('Return-Path', '<' . trim($this->ReturnPath) . '>');
-		} elseif ($this->Sender == '') {
+		} else if ($this->Sender == '') {
 			$result .= $this->HeaderLine('Return-Path', '<' . trim($this->From) . '>');
 		} else {
 			$result .= $this->HeaderLine('Return-Path', '<' . trim($this->Sender) . '>');
@@ -1418,15 +1419,16 @@ class Sender {
 					$this->SingleToArray[] = $this->AddrFormat($t);
 				}
 			} else {
-				if (count($this->to) > 0) {
+				/*if (count($this->to) > 0) {
 					$result .= $this->AddrAppend('To', $this->to);
-				} elseif (count($this->cc) == 0) {
+				} else*/
+				if (count($this->cc) == 0) {
 					$result .= $this->HeaderLine('To', 'undisclosed-recipients:;');
 				}
 			}
 		}
 
-		$from = array();
+		$from = [];
 		$from[0][0] = trim($this->From);
 		$from[0][1] = $this->FromName;
 		$result .= $this->AddrAppend('From', $from);
@@ -1534,8 +1536,8 @@ class Sender {
 	/**
 	 * Assembles the message body.  Returns an empty string on failure.
 	 * @access public
-	 * @throws Exception
 	 * @return string The assembled message body
+	 * @throws Exception
 	 */
 	public function CreateBody() {
 		$body = '';
@@ -1644,7 +1646,7 @@ class Sender {
 
 		if ($this->IsError()) {
 			$body = '';
-		} elseif ($this->sign_key_file) {
+		} else if ($this->sign_key_file) {
 			try {
 				if (!defined('PKCS7_TEXT')) {
 					throw new Exception($this->Lang('signing') . ' OpenSSL extension missing.');
@@ -1652,7 +1654,7 @@ class Sender {
 				$file = tempnam(sys_get_temp_dir(), 'mail');
 				file_put_contents($file, $body); //TODO check this worked
 				$signed = tempnam(sys_get_temp_dir(), 'signed');
-				if (@openssl_pkcs7_sign($file, $signed, 'file://' . realpath($this->sign_cert_file), array('file://' . realpath($this->sign_key_file), $this->sign_key_pass), null)) {
+				if (@openssl_pkcs7_sign($file, $signed, 'file://' . realpath($this->sign_cert_file), ['file://' . realpath($this->sign_key_file), $this->sign_key_pass], null)) {
 					@unlink($file);
 					$body = file_get_contents($signed);
 					@unlink($signed);
@@ -1716,7 +1718,7 @@ class Sender {
 	 * @return void
 	 */
 	protected function SetMessageType() {
-		$this->message_type = array();
+		$this->message_type = [];
 		if ($this->AlternativeExists())
 			$this->message_type[] = "alt";
 		if ($this->InlineImageExists())
@@ -1761,8 +1763,8 @@ class Sender {
 	 * @param string $name Overrides the attachment name.
 	 * @param string $encoding File encoding (see $Encoding).
 	 * @param string $type File extension (MIME) type.
-	 * @throws Exception
 	 * @return bool
+	 * @throws Exception
 	 */
 	public function AddAttachment($path, $name = '', $encoding = 'base64', $type = '') {
 		try {
@@ -1780,7 +1782,7 @@ class Sender {
 				$name = $filename;
 			}
 
-			$this->attachment[] = array(
+			$this->attachment[] = [
 				0 => $path,
 				1 => $filename,
 				2 => $name,
@@ -1789,7 +1791,7 @@ class Sender {
 				5 => false, // isStringAttachment
 				6 => 'attachment',
 				7 => 0
-			);
+			];
 		} catch (Exception $e) {
 			$this->SetError($e->getMessage());
 			if ($this->exceptions) {
@@ -1821,9 +1823,9 @@ class Sender {
 	 */
 	protected function AttachAll($disposition_type, $boundary) {
 		// Return text of body
-		$mime = array();
-		$cidUniq = array();
-		$incl = array();
+		$mime = [];
+		$cidUniq = [];
+		$incl = [];
 
 		// Add all attachments
 		foreach ($this->attachment as $attachment) {
@@ -1898,10 +1900,10 @@ class Sender {
 	 * Returns an empty string on failure.
 	 * @param string $path The full path to the file
 	 * @param string $encoding The encoding to use; one of 'base64', '7bit', '8bit', 'binary', 'quoted-printable'
+	 * @return string
 	 * @throws Exception
 	 * @see EncodeFile()
 	 * @access protected
-	 * @return string
 	 */
 	protected function EncodeFile($path, $encoding = 'base64') {
 		try {
@@ -2098,19 +2100,19 @@ class Sender {
 			return quoted_printable_encode($string);
 		}
 		//Fall back to a pure PHP implementation
-		$string = str_replace(array('%20', '%0D%0A.', '%0D%0A', '%'), array(' ', "\r\n=2E", "\r\n", '='), rawurlencode($string));
+		$string = str_replace(['%20', '%0D%0A.', '%0D%0A', '%'], [' ', "\r\n=2E", "\r\n", '='], rawurlencode($string));
 		$string = preg_replace('/[^\r\n]{' . ($line_max - 3) . '}[^=\r\n]{2}/', "$0=\r\n", $string);
 		return $string;
 	}
 
 	/**
 	 * Wrapper to preserve BC for old QP encoding function that was removed
-	 * @see EncodeQP()
-	 * @access public
 	 * @param string $string
 	 * @param integer $line_max
 	 * @param bool $space_conv
 	 * @return string
+	 * @see EncodeQP()
+	 * @access public
 	 */
 	public function EncodeQPphp($string, $line_max = 76, $space_conv = false) {
 		return $this->EncodeQP($string, $line_max);
@@ -2127,7 +2129,7 @@ class Sender {
 	public function EncodeQ($str, $position = 'text') {
 		//There should not be any EOL in the string
 		$pattern = '';
-		$encoded = str_replace(array("\r", "\n"), '', $str);
+		$encoded = str_replace(["\r", "\n"], '', $str);
 		switch (strtolower($position)) {
 			case 'phrase':
 				$pattern = '^A-Za-z0-9!*+\/ -';
@@ -2172,7 +2174,7 @@ class Sender {
 			$type = self::filenameToType($filename);
 		}
 		// Append to $attachment array
-		$this->attachment[] = array(
+		$this->attachment[] = [
 			0 => $string,
 			1 => $filename,
 			2 => basename($filename),
@@ -2181,7 +2183,7 @@ class Sender {
 			5 => true, // isStringAttachment
 			6 => 'attachment',
 			7 => 0
-		);
+		];
 	}
 
 	/**
@@ -2212,7 +2214,7 @@ class Sender {
 		}
 
 		// Append to $attachment array
-		$this->attachment[] = array(
+		$this->attachment[] = [
 			0 => $path,
 			1 => $filename,
 			2 => $name,
@@ -2221,7 +2223,7 @@ class Sender {
 			5 => false, // isStringAttachment
 			6 => 'inline',
 			7 => $cid
-		);
+		];
 		return true;
 	}
 
@@ -2245,7 +2247,7 @@ class Sender {
 		}
 
 		// Append to $attachment array
-		$this->attachment[] = array(
+		$this->attachment[] = [
 			0 => $string,
 			1 => $name,
 			2 => $name,
@@ -2254,7 +2256,7 @@ class Sender {
 			5 => true, // isStringAttachment
 			6 => 'inline',
 			7 => $cid
-		);
+		];
 		return true;
 	}
 
@@ -2305,7 +2307,7 @@ class Sender {
 		foreach ($this->to as $to) {
 			unset($this->all_recipients[strtolower($to[0])]);
 		}
-		$this->to = array();
+		$this->to = [];
 	}
 
 	/**
@@ -2316,7 +2318,7 @@ class Sender {
 		foreach ($this->cc as $cc) {
 			unset($this->all_recipients[strtolower($cc[0])]);
 		}
-		$this->cc = array();
+		$this->cc = [];
 	}
 
 	/**
@@ -2327,7 +2329,7 @@ class Sender {
 		foreach ($this->bcc as $bcc) {
 			unset($this->all_recipients[strtolower($bcc[0])]);
 		}
-		$this->bcc = array();
+		$this->bcc = [];
 	}
 
 	/**
@@ -2335,7 +2337,7 @@ class Sender {
 	 * @return void
 	 */
 	public function ClearReplyTos() {
-		$this->ReplyTo = array();
+		$this->ReplyTo = [];
 	}
 
 	/**
@@ -2344,10 +2346,10 @@ class Sender {
 	 * @return void
 	 */
 	public function ClearAllRecipients() {
-		$this->to = array();
-		$this->cc = array();
-		$this->bcc = array();
-		$this->all_recipients = array();
+		$this->to = [];
+		$this->cc = [];
+		$this->bcc = [];
+		$this->all_recipients = [];
 	}
 
 	/**
@@ -2356,7 +2358,7 @@ class Sender {
 	 * @return void
 	 */
 	public function ClearAttachments() {
-		$this->attachment = array();
+		$this->attachment = [];
 	}
 
 	/**
@@ -2364,7 +2366,7 @@ class Sender {
 	 * @return void
 	 */
 	public function ClearCustomHeaders() {
-		$this->CustomHeader = array();
+		$this->CustomHeader = [];
 	}
 
 	/////////////////////////////////////////////////
@@ -2379,7 +2381,7 @@ class Sender {
 	 */
 	protected function SetError($msg) {
 		$this->error_count++;
-		if ($this->Mailer == 'smtp' and ! is_null($this->smtp)) {
+		if ($this->Mailer == 'smtp' and !is_null($this->smtp)) {
 			$lasterror = $this->smtp->getError();
 			if (!empty($lasterror) and array_key_exists('smtp_msg', $lasterror)) {
 				$msg .= '<p>' . $this->Lang('smtp_error') . $lasterror['smtp_msg'] . "</p>\n";
@@ -2409,7 +2411,7 @@ class Sender {
 	protected function ServerHostname() {
 		if (!empty($this->Hostname)) {
 			$result = $this->Hostname;
-		} elseif (isset($_SERVER['SERVER_NAME'])) {
+		} else if (isset($_SERVER['SERVER_NAME'])) {
 			$result = $_SERVER['SERVER_NAME'];
 		} else {
 			$result = 'localhost.localdomain';
@@ -2453,7 +2455,7 @@ class Sender {
 	 */
 	public function FixEOL($str) {
 		// condense down to \n
-		$nstr = str_replace(array("\r\n", "\r"), "\n", $str);
+		$nstr = str_replace(["\r\n", "\r"], "\n", $str);
 		// Now convert LE as needed
 		if ($this->LE !== "\n") {
 			$nstr = str_replace("\n", $this->LE, $nstr);
@@ -2474,7 +2476,7 @@ class Sender {
 			// Value passed in as name:value
 			$this->CustomHeader[] = explode(':', $name, 2);
 		} else {
-			$this->CustomHeader[] = array($name, $value);
+			$this->CustomHeader[] = [$name, $value];
 		}
 	}
 
@@ -2545,7 +2547,7 @@ class Sender {
 	 * @static
 	 */
 	public static function _mime_types($ext = '') {
-		$mimes = array(
+		$mimes = [
 			'xl' => 'application/excel',
 			'hqx' => 'application/mac-binhex40',
 			'cpt' => 'application/mac-compactpro',
@@ -2632,7 +2634,7 @@ class Sender {
 			'rv' => 'video/vnd.rn-realvideo',
 			'avi' => 'video/x-msvideo',
 			'movie' => 'video/x-sgi-movie'
-		);
+		];
 		return (!isset($mimes[strtolower($ext)])) ? 'application/octet-stream' : $mimes[strtolower($ext)];
 	}
 
@@ -2662,8 +2664,8 @@ class Sender {
 	 * @static
 	 */
 	public static function mb_pathinfo($path, $options = null) {
-		$ret = array('dirname' => '', 'basename' => '', 'extension' => '', 'filename' => '');
-		$m = array();
+		$ret = ['dirname' => '', 'basename' => '', 'extension' => '', 'filename' => ''];
+		$m = [];
 		preg_match('%^(.*?)[\\\\/]*(([^/\\\\]*?)(\.([^\.\\\\/]+?)|))[\\\\/\.]*$%im', $path, $m);
 		if (array_key_exists(1, $m)) {
 			$ret['dirname'] = $m[1];
@@ -2709,8 +2711,8 @@ class Sender {
 	 * @param string $name
 	 * @param mixed $value
 	 * NOTE: will not work with arrays, there are no arrays to set/reset
-	 * @throws Exception
 	 * @return bool
+	 * @throws Exception
 	 * @todo Should this not be using __set() magic function?
 	 */
 	public function set($name, $value = '') {
@@ -2736,7 +2738,7 @@ class Sender {
 	 * @return string
 	 */
 	public function SecureHeader($str) {
-		return trim(str_replace(array("\r", "\n"), '', $str));
+		return trim(str_replace(["\r", "\n"], '', $str));
 	}
 
 	/**
@@ -2791,8 +2793,8 @@ class Sender {
 	 *
 	 * @access public
 	 * @param string $s Header
-	 * @throws Exception
 	 * @return string
+	 * @throws Exception
 	 */
 	public function DKIM_Sign($s) {
 		if (!defined('PKCS7_TEXT')) {
@@ -2824,7 +2826,7 @@ class Sender {
 		$s = preg_replace("/\r\n\s+/", " ", $s);
 		$lines = explode("\r\n", $s);
 		foreach ($lines as $key => $line) {
-			list($heading, $value) = explode(":", $line, 2);
+			[$heading, $value] = explode(":", $line, 2);
 			$heading = strtolower($heading);
 			$value = preg_replace("/\s+/", " ", $value); // Compress useless spaces
 			$lines[$key] = $heading . ":" . trim($value); // Don't forget to remove WSP around the value
@@ -2876,7 +2878,7 @@ class Sender {
 			if (strpos($header, 'From:') === 0) {
 				$from_header = $header;
 				$current = 'from_header';
-			} elseif (strpos($header, 'To:') === 0) {
+			} else if (strpos($header, 'To:') === 0) {
 				$to_header = $header;
 				$current = 'to_header';
 			} else {
@@ -2895,14 +2897,14 @@ class Sender {
 		$DKIMb64 = base64_encode(pack("H*", sha1($body))); // Base64 of packed binary SHA-1 hash of body
 		$ident = ($this->DKIM_identity == '') ? '' : " i=" . $this->DKIM_identity . ";";
 		$dkimhdrs = "DKIM-Signature: v=1; a=" . $DKIMsignatureType . "; q=" . $DKIMquery . "; l=" . $DKIMlen . "; s=" . $this->DKIM_selector . ";\r\n" .
-				"\tt=" . $DKIMtime . "; c=" . $DKIMcanonicalization . ";\r\n" .
-				"\th=From:To:Subject;\r\n" .
-				"\td=" . $this->DKIM_domain . ";" . $ident . "\r\n" .
-				"\tz=$from\r\n" .
-				"\t|$to\r\n" .
-				"\t|$subject;\r\n" .
-				"\tbh=" . $DKIMb64 . ";\r\n" .
-				"\tb=";
+			"\tt=" . $DKIMtime . "; c=" . $DKIMcanonicalization . ";\r\n" .
+			"\th=From:To:Subject;\r\n" .
+			"\td=" . $this->DKIM_domain . ";" . $ident . "\r\n" .
+			"\tz=$from\r\n" .
+			"\t|$to\r\n" .
+			"\t|$subject;\r\n" .
+			"\tbh=" . $DKIMb64 . ";\r\n" .
+			"\tb=";
 		$toSign = $this->DKIM_HeaderC($from_header . "\r\n" . $to_header . "\r\n" . $subject_header . "\r\n" . $dkimhdrs);
 		$signed = $this->DKIM_Sign($toSign);
 		return $dkimhdrs . $signed . "\r\n";
@@ -2920,7 +2922,7 @@ class Sender {
 	 */
 	protected function doCallback($isSent, $to, $cc, $bcc, $subject, $body, $from = null) {
 		if (!empty($this->action_function) && is_callable($this->action_function)) {
-			$params = array($isSent, $to, $cc, $bcc, $subject, $body, $from);
+			$params = [$isSent, $to, $cc, $bcc, $subject, $body, $from];
 			call_user_func_array($this->action_function, $params);
 		}
 	}
