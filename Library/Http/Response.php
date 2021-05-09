@@ -128,6 +128,7 @@ class Response {
 	public function sendHeaders() {
 		if ($this->isHeadersSent())
 			return $this;
+		self::sendHttpCode($this->httpCode ?: 200);
 		foreach ($this->headers as $value) {
 			header($value[0], $value[1], $value[2]);
 		}
@@ -142,18 +143,17 @@ class Response {
 
 		$length = strlen($content);
 
-		if ($this->range && preg_match('/(\w+)=(\d+)-(\d*)/', $this->range, $m)) {
+		/*if ($this->range && preg_match('/(\w+)=(\d+)-(\d*)/', $this->range, $m)) {
 			$start = $m[2];
 			$end = ($m[3] ? $m[3] : ($length - 1));
 			$this->setRawHeader('Accept-Ranges: ' . $m[1]);
 			$this->setRawHeader('Content-Range: ' . $m[1] . ' ' . $start . '-' . $end . '/' . $length);
 			$body = substr($body, $start, $end);
 			$length = $end - $start;
-		}
+		}*/
 
 		$this->setContentLength($length);
 
-		self::sendHttpCode($this->httpCode ?: 200);
 		$this->sendHeaders();
 		echo $content;
 		return $this;
