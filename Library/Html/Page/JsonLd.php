@@ -33,7 +33,7 @@ class JsonLd {
 				$html[] = $s;
 		}
 
-		return empty($html) ? '' : '<script type="application/ld+json">' . implode(',', $html) . '</script>';
+		return empty($html) ? '' : '<script type="application/ld+json">[' . implode(',', $html) . ']</script>';
 	}
 
 }
