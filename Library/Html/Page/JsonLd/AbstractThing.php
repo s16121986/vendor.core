@@ -36,7 +36,7 @@ abstract class AbstractThing {
 			$data[$k] = $v;
 		}
 
-		return empty($data) ? '' : json_encode($data);
+		return json_encode($data);
 	}
 
 	abstract protected function init();
