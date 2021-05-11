@@ -1,21 +1,23 @@
 <?php
+
 namespace Html\Page;
 
-class Page{
-	
+class Page {
+
 	protected $head;
 	protected $jsonLd;
 	protected $H1;
 	protected $text;
-	protected $data = array();
-	
+	protected $data = [];
+
 	public function __construct() {
 		$this->head = new Head();
 	}
-	
+
 	public function __get($name) {
 		switch ($name) {
-			case 'h1': return $this->H1;
+			case 'h1':
+				return $this->H1;
 		}
 		if (isset($this->$name))
 			return $this->$name;
@@ -25,7 +27,7 @@ class Page{
 		return null;
 		//return $this->getHead()->getMetaContent($name);
 	}
-	
+
 	public function __set($name, $value) {
 		switch ($name) {
 			case 'title':
@@ -44,7 +46,7 @@ class Page{
 				$this->data[$name] = $value;
 		}
 	}
-	
+
 	public function setData($data) {
 		if (is_array($data)) {
 			foreach ($data as $k => $v) {
@@ -53,11 +55,11 @@ class Page{
 		}
 		return $this;
 	}
-	
+
 	public function getHead() {
 		return $this->head;
 	}
-	
+
 	public function getJsonLd() {
 		if (!$this->jsonLd)
 			$this->jsonLd = new JsonLd();
@@ -80,12 +82,12 @@ class Page{
 		$this->text = $text;
 		return $this;
 	}
-	
+
 	public function doctype() {
 		//<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 		return '<!DOCTYPE html>';
 	}
-	
+
 	public function html() {
 		return '<html>';
 	}
@@ -93,5 +95,5 @@ class Page{
 	public function h1() {
 		return '<h1>' . ($this->H1 ? $this->H1 : $this->getHead()->getTitle()) . '</h1>';
 	}
-	
+
 }
