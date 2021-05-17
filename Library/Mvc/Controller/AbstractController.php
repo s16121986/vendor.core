@@ -62,4 +62,8 @@ abstract class AbstractController {
 
 	}
 
+	public function trigger($event) {
+
+	}
+
 }

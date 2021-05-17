@@ -74,10 +74,15 @@ abstract class AbstractActionController extends AbstractController {
 			$path['layout'] = $layout;
 		else
 			$attributes['layout'] = $layout;
+
+		$this->trigger('layout');
+
 		return $this->view->render($path, $attributes);
 	}
 
 	public function render($path, array $attributes = []) {
+		$this->trigger('render');
+
 		return $this->view->render($path, $attributes);
 	}
 
