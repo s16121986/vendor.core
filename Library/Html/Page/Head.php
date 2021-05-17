@@ -20,6 +20,21 @@ class Head {
 	protected $scripts = [];
 	protected $contents = [];
 
+	public function __get($name) {
+		switch ($name) {
+			case 'title':
+			case 'relativePath':
+			case 'baseHref':
+				return $this->$name;
+			case 'description':
+			case 'keywords':
+				$metaId = 'meta_name_' . $name;
+				return isset($this->meta[$metaId]) ? $this->meta[$metaId]->getAttribute('content') : null;
+		}
+
+		return null;
+	}
+
 	public function fromString($html) {
 		if (empty($html))
 			return;
