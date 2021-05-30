@@ -1,24 +1,25 @@
 <?php
+
 namespace Api\Attribute;
 
-class AttributeString extends AbstractAttribute{
+class AttributeString extends AbstractAttribute {
 
 	protected $qualifiers = [
 		'length' => 0,
 		'minlength' => 0
 	];
-	
+
 	public function checkValue($value) {
 		if (null === $value && false === $this->notnull)
 			return true;
-		
+
 		if (is_scalar($value))
 			$value = (string)$value;
-		
-		return (is_string($value) 
+
+		return (is_string($value)
 			&& parent::checkValue($value)
-			&& (strlen($value) >= $this->minlength || ('' === $value && false === $this->notnull)) 
-			&& !($this->required && empty($value)));
+			&& (strlen($value) >= $this->minlength || ('' === trim($value) && false === $this->notnull))
+			&& !($this->required && trim($value) === ''));
 	}
 
 	public function prepareValue($value) {
@@ -28,7 +29,7 @@ class AttributeString extends AbstractAttribute{
 		$value = (string)$value;
 		if ($this->length)
 			$value = mb_substr($value, 0, $this->length, 'utf-8');
-		
+
 		return $value;
 	}
 
