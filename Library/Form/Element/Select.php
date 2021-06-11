@@ -1,7 +1,8 @@
 <?php
+
 namespace Form\Element;
 
-class Select extends Xhtml{
+class Select extends Xhtml {
 
 	const EMPTY_VALUE = '';
 
@@ -19,23 +20,23 @@ class Select extends Xhtml{
 		'emptyItem' => false,
 		'emptyValue' => null,
 		'emptyItemValue' => '',
-		
+
 		'allowNotExists' => false,
 		'idKey' => 'id',
 		'nameKey' => 'name'
 	];
-	
+
 	private static function getValueId($value) {
 		if (is_string($value) && preg_match('/^\d+$/', $value)) {
 			$value = (int)$value;
 		}
 		return $value;
 	}
-	
+
 	private static function getItemParam($object, $key, $autoKeys = []) {
 		if (isset($object->$key))
 			return $object->$key;
-		
+
 		foreach ($autoKeys as $key) {
 			if (isset($object->$key))
 				return $object->$key;
@@ -45,7 +46,7 @@ class Select extends Xhtml{
 
 	protected function initItem($value, $text = '') {
 		$item = new \stdClass();
-			
+
 		if (is_array($text) || is_object($text)) {
 			$text = (object)$text;
 			$item->value = self::getItemParam($text, $this->valueIndex, self::$_autoValueKeys);
@@ -60,13 +61,13 @@ class Select extends Xhtml{
 			$item->attr = null;
 			$item->parent_id = null;
 		}
-		
+
 		$this->_items[] = $item;
 	}
 
 	protected function initGroup($text = '') {
 		$item = new \stdClass();
-		
+
 		if (is_object($text) || is_array($text)) {
 			$text = (object)$text;
 			$item->id = self::getItemParam($text, 'id');
@@ -76,32 +77,32 @@ class Select extends Xhtml{
 			$item->id = null;
 			$item->text = $text;
 		}
-		
+
 		$this->_groups[] = $item;
 	}
 
 	protected function getDBItems($data) {
 		if (isset($data['table'])) {
-			$data = array_merge(array(
+			$data = array_merge([
 				'value' => 'id',
 				'text' => 'name',
 				'where' => '1',
 				'order' => 'name'
-			), $data);
-			$fields = array($data['value'], $data['text']);
+			], $data);
+			$fields = [$data['value'], $data['text']];
 			$order = $data['order'];
 			return \Db::from($data['table'], $fields)
-					->where($data['where'])
-					->order($order)
-					->query()->fetchAll();
+				->where($data['where'])
+				->order($order)
+				->query()->fetchAll();
 		}
-		return array();
+		return [];
 	}
-	
+
 	public function getGroups() {
 		if (null === $this->_groups) {
-			$this->_groups = array();
-			$itemsTemp = array();
+			$this->_groups = [];
+			$itemsTemp = [];
 			$itemsData = $this->groups;
 			if (is_array($itemsData)) {
 				$itemsTemp = $this->getDBItems($itemsData);
@@ -120,7 +121,7 @@ class Select extends Xhtml{
 	}
 
 	public function getItems() {
-			//if (isset($_GET['test']) && $this->name == 'param16') var_dump($this->_items);
+		//if (isset($_GET['test']) && $this->name == 'param16') var_dump($this->_items);
 		if (null === $this->_items) {
 			$this->_items = [];
 			$itemsTemp = [];
@@ -140,7 +141,7 @@ class Select extends Xhtml{
 		}
 		return $this->_items;
 	}
-	
+
 	public function getItem($value) {
 		foreach ($this->getItems() as $item) {
 			if ($item->value == $value)
@@ -153,7 +154,7 @@ class Select extends Xhtml{
 		$this->initItem($value, $text);
 		return $this;
 	}
-	
+
 	public function valueExists($value) {
 		return (bool)$this->getItem($value);
 	}
@@ -166,7 +167,7 @@ class Select extends Xhtml{
 			return is_array($value) && !empty($value);
 		} else {
 			return ($this->allowNotExists || $this->valueExists($value));
-		}		
+		}
 	}
 
 	public function getValue() {
@@ -176,7 +177,7 @@ class Select extends Xhtml{
 		}
 		return $value;
 	}
-	
+
 	public function addValue($value) {
 		if ($this->checkValue($value)) {
 			$this->_value[] = $this->prepareValue($value);
@@ -190,7 +191,7 @@ class Select extends Xhtml{
 		}
 		if ($this->multiple) {
 			$valueTemp = $value;
-			$value = array();
+			$value = [];
 			if (is_array($valueTemp)) {
 				foreach ($valueTemp as $val) {
 					if ($this->allowNotExists || $this->valueExists($val)) {
@@ -206,38 +207,38 @@ class Select extends Xhtml{
 		}
 		return $value;
 	}
-	
+
 	private function _option($item) {
 		return '<option value="' . self::escape($item->value) . '"'
-					. ($item->attr ? ' ' . $item->attr : '')
-					. ($this->isSelected($item->value) ? ' selected' : '')
-				. '>' . $item->text . '</option>';
+			. ($item->attr ? ' ' . $item->attr : '')
+			. ($this->isSelected($item->value) ? ' selected' : '')
+			. '>' . $item->text . '</option>';
 	}
-	
+
 	protected function getOptionsHtml() {
 		$html = '';
-		
+
 		if (false !== $this->emptyItem)
 			$html .= '<option value="' . self::EMPTY_VALUE . '">' . $this->emptyItem . '</option>';
-		
+
 		//$data['value'] = isset($text->{$this->valueIndex}) ? $text->{$this->valueIndex} : self::getAutoKey(self::$_autoValueKeys, $text);
 		//$data['text'] = isset($text->{$this->textIndex}) ? $text->{$this->textIndex} : self::getAutoKey(self::$_autoTextKeys, $text);
 		if ($this->groups && $this->groupIndex) {
 			$items = $this->getItems();
-			
+
 			foreach ($items as $item) {
-				if ($item->{$this->groupIndex})
+				if (isset($item->{$this->groupIndex}) && $item->{$this->groupIndex})
 					continue;
-				
+
 				$html .= $this->_option($item);
 			}
-			
+
 			foreach ($this->getGroups() as $group) {
 				$html .= '<optgroup label="' . $group->text . '">';
 				foreach ($items as $item) {
-					if ($item->{$this->groupIndex} != $group->id)
+					if (!isset($item->{$this->groupIndex}) || $item->{$this->groupIndex} != $group->id)
 						continue;
-					
+
 					$html .= $this->_option($item);
 				}
 				$html .= '</optgroup>';
@@ -248,7 +249,7 @@ class Select extends Xhtml{
 			}
 		}
 		//var_dump($this->default);
-		
+
 		return $html;
 	}
 
@@ -259,15 +260,15 @@ class Select extends Xhtml{
 		}
 		return '';
 	}
-	
+
 	public function isSelected($value) {
 		$value = self::getValueId($value);
 		if ($this->multiple) {
 			if (is_array($this->value))
-			foreach ($this->value as $val) {
-				if ($val == $value)
-					return true;
-			}
+				foreach ($this->value as $val) {
+					if ($val == $value)
+						return true;
+				}
 		} else {
 			return ($this->value === $value);
 		}
@@ -288,8 +289,9 @@ class Select extends Xhtml{
 		$html .= '</select>';
 		return $html;
 	}
-	
+
 	public function isEmpty() {
 		return (null === $this->value);
 	}
+
 }
