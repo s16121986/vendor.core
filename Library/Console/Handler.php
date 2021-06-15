@@ -2,6 +2,7 @@
 
 namespace Console;
 
+use Autoload;
 use Exception;
 
 class Handler {
