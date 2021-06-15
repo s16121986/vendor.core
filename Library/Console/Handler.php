@@ -12,6 +12,10 @@ class Handler {
 
 	public static function setup(array $options = []) {
 		self::$options = array_merge(self::$options, $options);
+
+		require_once 'Command/AbstractCommand.php';
+
+		Autoload::addPath(self::getOption('commandsPath'), self::getOption('commandsNamespace'), '');
 	}
 
 	public static function run(array $argv = null) {
@@ -87,7 +91,10 @@ class Handler {
 		}, $args);
 
 		$commandClass = self::getOption('commandsNamespace') . implode('\\', $cls);
-		if (class_exists($commandClass, false))
+		if (!class_exists($commandClass, true))
+			throw new Exception('command "' . $commandClass . '" not exists');
+
+		/*if (class_exists($commandClass, false))
 			return $commandClass;
 
 		$commandFile = self::getOption('commandsPath') . DIRECTORY_SEPARATOR
@@ -99,7 +106,7 @@ class Handler {
 		include_once $commandFile;
 
 		if (!class_exists($commandClass, false))
-			throw new Exception('command "' . $commandClass . '" not exists');
+			throw new Exception('command "' . $commandClass . '" not exists');*/
 
 		return $commandClass;
 	}
