@@ -274,6 +274,21 @@ class Head {
 		return $html;
 	}
 
+	public function toString() {
+		$html = '';
+		foreach ($this->meta as $meta) {
+			$html .= $meta->getHtml() . "\n";
+		}
+
+		//$html .= $this->getHtml('scripts');
+		//$html .= $this->getHtml('styles');
+
+		if ($this->baseHref)
+			$html .= $this->baseHref->getHtml() . "\n";
+
+		return $html;
+	}
+
 	protected function _addMeta(AbstractMeta $meta) {
 		$uid = $meta->getIdentifier();
 		if ($uid)
