@@ -128,7 +128,7 @@ abstract class Handler {
 			assert_options(ASSERT_ACTIVE, self::$previousAssertOptions[ASSERT_ACTIVE]);
 			assert_options(ASSERT_WARNING, self::$previousAssertOptions[ASSERT_WARNING]);
 			assert_options(ASSERT_BAIL, self::$previousAssertOptions[ASSERT_BAIL]);
-			assert_options(ASSERT_QUIET_EVAL, self::$previousAssertOptions[ASSERT_QUIET_EVAL]);
+			//assert_options(ASSERT_QUIET_EVAL, self::$previousAssertOptions[ASSERT_QUIET_EVAL]);
 			assert_options(ASSERT_CALLBACK, self::$previousAssertOptions[ASSERT_CALLBACK]);
 			self::$setupFlag = false;
 		}
