@@ -115,10 +115,7 @@ class Join extends Item {
 	}
 
 	public function getTableExpr() {
-		if ($this->name instanceof Expr)
-			return $this->name;
-
-		return new Expr($this->name . ' as ' . $this->alias);
+		return [$this->alias => (string)$this->name];
 	}
 
 }
