@@ -199,14 +199,14 @@ abstract class AbstractAdapter {
 			}
 			switch ($join->type) {
 				case 'inner':
-					$this->joinInner($join->getTableName(), $join->condition, $cols);
+					$this->joinInner($join->getTableExpr(), $join->condition, $cols);
 					break;
 				case 'right':
-					$this->joinRight($join->getTableName(), $join->condition, $cols);
+					$this->joinRight($join->getTableExpr(), $join->condition, $cols);
 					break;
 				//case 'outer':$this->joinOuter($join->name . ' as ' . $join->alias, $join->condition, $cols);break;
 				default:
-					$this->joinLeft($join->getTableName(), $join->condition, $cols);
+					$this->joinLeft($join->getTableExpr(), $join->condition, $cols);
 			}
 		}
 		return $this;

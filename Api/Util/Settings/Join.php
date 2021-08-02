@@ -1,15 +1,16 @@
 <?php
+
 namespace Api\Util\Settings;
 
 use Db\Expr;
 use Api\Util\Settings\Collection\Item;
 
-class Join extends Item{
+class Join extends Item {
 
-    const JOIN_INNER = 'inner';
-    //const JOIN_OUTER = 'outer';
-    const JOIN_LEFT = 'left';
-    const JOIN_RIGHT = 'right';
+	const JOIN_INNER = 'inner';
+	//const JOIN_OUTER = 'outer';
+	const JOIN_LEFT = 'left';
+	const JOIN_RIGHT = 'right';
 
 	protected $columns = null;
 	protected $params = [
@@ -22,8 +23,8 @@ class Join extends Item{
 	public function __construct($name, $condition, $columns = null, $options = null) {
 		$this->columns = new Columns();
 		$this->setName($name)
-				->setCondition($condition)
-				->columns($columns);
+			->setCondition($condition)
+			->columns($columns);
 		if ($options) {
 			if (is_array($options)) {
 				foreach ($options as $k => $v) {
@@ -46,7 +47,8 @@ class Join extends Item{
 
 	public function __get($name) {
 		switch ($name) {
-			case 'columns':return $this->columns;
+			case 'columns':
+				return $this->columns;
 		}
 		if (isset($this->params[$name])) {
 			return $this->params[$name];
@@ -56,13 +58,13 @@ class Join extends Item{
 
 	public function setName($name) {
 		if ($name instanceof Expr) {
-		} elseif (is_array($name)) {
+		} else if (is_array($name)) {
 			foreach ($name as $k => $v) {
 				$this->setAlias($k);
 				$name = $v;
 				break;
 			}
-		} elseif (preg_match('/^(.+)\s+as\s+(.+)$/i', $name, $m)) {
+		} else if (preg_match('/^(.+)\s+as\s+(.+)$/i', $name, $m)) {
 			$name = $m[1];
 			$this->setAlias($m[2]);
 		} else {
@@ -84,7 +86,7 @@ class Join extends Item{
 
 	public function columns($columns) {
 		if (!is_array($columns)) {
-			$columns = array($columns);
+			$columns = [$columns];
 		}
 		foreach ($columns as $col) {
 			$this->addColumn($col);
@@ -104,12 +106,19 @@ class Join extends Item{
 		$this->columns->add($column);
 		return $this;
 	}
-	
+
 	public function getTableName() {
 		if ($this->name instanceof Expr) {
 			return $this->name;
 		}
 		return $this->name . ' as ' . $this->alias;
+	}
+
+	public function getTableExpr() {
+		if ($this->name instanceof Expr)
+			return $this->name;
+
+		return new Expr($this->name . ' as ' . $this->alias);
 	}
 
 }
