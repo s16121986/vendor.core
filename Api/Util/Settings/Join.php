@@ -115,7 +115,8 @@ class Join extends Item {
 	}
 
 	public function getTableExpr() {
-		return [$this->alias => (string)$this->name];
+		$expr = ($this->name instanceof Expr) ? $this->name : new Expr($this->name);
+		return [$this->alias => $expr];
 	}
 
 }
