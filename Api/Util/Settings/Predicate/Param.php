@@ -231,6 +231,10 @@ class Param{
 		
 		return null;
 	}
+
+	public function __toString() {
+		return (string)$this->getSqlString();
+	}
 	
 	protected function condition($condition, $value = null) {
 		if (null === $value)

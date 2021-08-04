@@ -1,4 +1,5 @@
 <?php
+
 namespace Api\Util;
 
 use Translation;
@@ -13,7 +14,7 @@ use Api\Util\Settings\Quicksearch;
 use Api\Util\Settings\Join;
 use Api\Util\Settings\Predicate\Param as ParamPredicate;
 
-class Settings{
+class Settings {
 
 	protected $_api;
 	protected $_columns;
@@ -49,10 +50,10 @@ class Settings{
 			foreach ($this->_api->getAttributes() as $attribute) {
 				if (!$attribute->filterable || !$this->hasParam($attribute->name))
 					continue;
-				
+
 				//$this->predicateIf($attribute->name, $this->_api->table . '.' . $attribute->name, $attribute->getType());
 				//continue;
-				
+
 				if ($attribute->filterable) {
 					$filter = new FilterItem($this->getParam($attribute->name));
 					$filter->setAttribute($attribute);
@@ -62,9 +63,9 @@ class Settings{
 				if ($attribute->getType() == \AttributeType::Model && $attribute->joins) {
 					$joinTable = $attribute->getModel()->table;
 					foreach ($attribute->joins as $join) {
-						$this->join($joinTable, 
-							'`' . $this->_api->table . '`.`' . $attribute->name . '`=`' . $joinTable . '`.`id`', 
-							$join[0], 
+						$this->join($joinTable,
+							'`' . $this->_api->table . '`.`' . $attribute->name . '`=`' . $joinTable . '`.`id`',
+							$join[0],
 							$join[1]);
 					}
 				}
@@ -76,20 +77,20 @@ class Settings{
 	public function __get($name) {
 		if (isset($this->{'_' . $name}))
 			return $this->{'_' . $name};
-			
+
 		if (isset($this->$name))
 			return $this->$name;
-			
+
 		if (isset($this->_params[$name])) {
 			return $this->_params[$name];
 		}
 		return null;
 	}
-	
+
 	public function __set($name, $value) {
 		$this->setParam($name, $value);
 	}
-	
+
 	public function enableQuickSearch() {
 		$columns = func_get_args();
 		$this->_quicksearch
@@ -111,7 +112,7 @@ class Settings{
 	public function getParam($name) {
 		return ($this->hasParam($name) ? $this->_params[$name] : null);
 	}
-	
+
 	public function removeParam($name) {
 		unset($this->_params[$name]);
 		return $this;
@@ -148,19 +149,19 @@ class Settings{
 		$this->_joins[$join->alias] = $join;
 		return $this;
 	}
-	
+
 	public function joinLeft($name, $condition, $columns = null, $options = null) {
 		return $this->join($name, $condition, $columns, $options);
 	}
-	
+
 	public function joinInner($name, $condition, $columns = null, $options = null) {
 		if (!is_array($options)) {
-			$options = array();
+			$options = [];
 		}
 		$options['type'] = 'inner';
 		return $this->join($name, $condition, $columns, $options);
 	}
-	
+
 	public function joinTranslation($table, $on, $columns) {
 		if (preg_match('/^([a-z_]+) as ([a-z_]+)$/', $table, $m)) {
 			$alias = $m[2];
@@ -172,9 +173,9 @@ class Settings{
 		if (preg_match('/^[a-z_]+$/i', $on))
 			$on = $this->_api->table . '.' . $on;
 		return $this->joinLeft($translationTable,
-				$alias. '.translatable_id=' . $on
-					. ' AND ' . $alias . '.language="' . Translation::getCode() . '"',
-				$columns);
+			$alias . '.translatable_id=' . $on
+			. ' AND ' . $alias . '.language="' . Translation::getCode() . '"',
+			$columns);
 	}
 
 	public function limit($step, $start = 0) {
@@ -193,11 +194,18 @@ class Settings{
 		}
 		return $this;
 	}
-	
+
+	public function getPredicate($param, $identifier = null, $valueType = null) {
+		if (!$this->hasParam($param))
+			return false;
+
+		return new ParamPredicate($identifier ?? $param, $this->getParam($param), $valueType);
+	}
+
 	public function predicateIf($param, $identifier, $valueType = null) {
 		if (!$this->hasParam($param))
 			return $this;
-		
+
 		$this->predicates[] = new ParamPredicate($identifier, $this->getParam($param), $valueType);
 		return $this;
 	}
@@ -208,14 +216,14 @@ class Settings{
 		$this->_group->reset();
 		$this->_limit->reset();
 		$this->_order->reset();
-		$this->_params = array();
+		$this->_params = [];
 		return $this;
 	}
-	
+
 	private function _setParam($name, $value) {
 		if (empty($value) || $this->_api && $this->_api->getAttribute($name))
 			return false;
-		
+
 		switch ($name) {
 			case 'fields':
 			case 'columns':
@@ -230,12 +238,18 @@ class Settings{
 					$item->setDirection($value);
 				}
 				break;
-			case 'limit':$this->limit($value);break;
+			case 'limit':
+				$this->limit($value);
+				break;
 			case 'step':
-			case 'max-results':$this->_limit->setStep($value);break;
+			case 'max-results':
+				$this->_limit->setStep($value);
+				break;
 			case 'start':
 			case 'offset':
-			case 'start-index':$this->_limit->setStart($value);break;
+			case 'start-index':
+				$this->_limit->setStart($value);
+				break;
 			case 'group':
 			case 'groupby':
 				$this->group($value);
