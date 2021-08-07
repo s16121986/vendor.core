@@ -76,7 +76,7 @@ abstract class AbstractColumn{
 			return $this->emptyText;
 		
 		//$row['value'] = $value;
-		if ($this->href) {
+		if ($this->href)
 			return '<a href="' . \Format::formatTemplate($this->href, $row) . '"'
 				. ($this->hrefTarget ? ' target="' . $this->hrefTarget . '"' : '') . '>' . $value . '</a>';
 
