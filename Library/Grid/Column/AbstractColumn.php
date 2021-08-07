@@ -69,20 +69,20 @@ abstract class AbstractColumn {
 
 	public function render($value, $row) {
 		$value = $this->formatValue($value, $row);
-		if ($this->renderer) {
-			$value = call_user_func_array($this->renderer, [$row, $this->params]);
-		}
-		if ($this->renderTpl) {
+		if ($this->renderer)
+			$value = call_user_func_array($this->renderer, [$row, $value, $this->params]);
+
+		if ($this->renderTpl)
 			$value = \Format::formatTemplate($this->renderTpl, $row);
-		}
+
 		if (null === $value || '' === $value)
 			return $this->emptyText;
 
 		//$row['value'] = $value;
-		if ($this->href) {
+		if ($this->href)
 			return '<a href="' . \Format::formatTemplate($this->href, $row) . '"'
 				. ($this->hrefTarget ? ' target="' . $this->hrefTarget . '"' : '') . '>' . $value . '</a>';
-		}
+
 		return $value;
 	}
 
