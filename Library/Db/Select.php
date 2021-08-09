@@ -448,8 +448,7 @@ class Select{
                 /**
                  * @see Db_Select_Exception
                  */
-                require_once 'Library/Db/Select/Exception.php';
-                throw new Db_Select_Exception("You cannot define a correlation name '$correlationName' more than once");
+                throw new Exception("You cannot define a correlation name '$correlationName' more than once");
             }
 
             if ($type == self::FROM) {
