@@ -274,7 +274,7 @@ class Head {
 		return $html;
 	}
 
-	public function toString() {
+	public function __toString() {
 		$html = '';
 		foreach ($this->meta as $meta) {
 			$html .= $meta->getHtml() . "\n";
