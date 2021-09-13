@@ -63,6 +63,10 @@ class AttributeFile extends AbstractAttribute {
 		}
 	}
 
+	public function getPlugin($key) {
+		return $this->plugins[$key];
+	}
+
 	public function checkValue($value) {
 		if ($this->multiple)
 			return is_array($value);
