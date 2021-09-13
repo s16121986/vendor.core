@@ -70,29 +70,32 @@ class File extends BaseFile {
 		if ($this->isEmpty())
 			return false;
 
-		if (!$this->guid && null === $this->content && $this->exists())
-			$this->setContent($this->getContents());
+		//if (!$this->guid && null === $this->content && $this->exists())
+		//	$this->setContent($this->getContents());
 
-		if (null === $this->content)
+		if (!$this->hasContent())
 			throw new Exception('File content empty');
 
 		$isNew = $this->isNew();
 
-		$guid = Util::getNewGuid();
+		//$guid = $isNew ? Util::getNewGuid() : $this->guid;
 
 		$data = [];
-		$data['guid'] = $guid;
-		$data['path'] = Util::getPath($guid, false);
-		$data['fullname'] = Util::getDestination($guid, false);
-		$data['created'] = 'CURRENT_TIMESTAMP';
 
 		if ($isNew) {
+			$guid = Util::getNewGuid();
+			$data['guid'] = $guid;
+			$data['path'] = Util::getPath($guid, false);
+			$data['fullname'] = Util::getDestination($guid, false);
+			$data['created'] = 'CURRENT_TIMESTAMP';
+
 			if ($this->parent_id)
 				$data['index'] = Db::from(Util::config('table'), 'MAX(`index`)')
 						->where('parent_id=' . $this->parent_id)
 						->where('type=?', $this->type)
 						->query()->fetchColumn() + 1;
 		} else {
+			$guid = $this->guid;
 			$data['index'] = $this->index ?: 0;
 		}
 
@@ -104,13 +107,16 @@ class File extends BaseFile {
 		if (!$id)
 			return false;
 
-		$this
-			->set('id', $id)
-			->setGuid($guid);
+		$content = $this->getContents(); //store content before change fullname
+
+		$this->set('id', $id);
+
+		if ($isNew)
+			$this->setGuid($guid);
 
 		Util::checkPath($guid);
 
-		Util::fwrite($this);
+		Util::fwrite($this, $content);
 
 		if ($this->parts) {
 			foreach ($this->parts as $part) {
