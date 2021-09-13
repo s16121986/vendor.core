@@ -78,21 +78,24 @@ class File extends BaseFile {
 
 		$isNew = $this->isNew();
 
-		$guid = Util::getNewGuid();
+		//$guid = $isNew ? Util::getNewGuid() : $this->guid;
 
 		$data = [];
-		$data['guid'] = $guid;
-		$data['path'] = Util::getPath($guid, false);
-		$data['fullname'] = Util::getDestination($guid, false);
-		$data['created'] = 'CURRENT_TIMESTAMP';
 
 		if ($isNew) {
+			$guid = Util::getNewGuid();
+			$data['guid'] = $guid;
+			$data['path'] = Util::getPath($guid, false);
+			$data['fullname'] = Util::getDestination($guid, false);
+			$data['created'] = 'CURRENT_TIMESTAMP';
+
 			if ($this->parent_id)
 				$data['index'] = Db::from(Util::config('table'), 'MAX(`index`)')
 						->where('parent_id=' . $this->parent_id)
 						->where('type=?', $this->type)
 						->query()->fetchColumn() + 1;
 		} else {
+			$guid = $this->guid;
 			$data['index'] = $this->index ?: 0;
 		}
 
@@ -106,9 +109,10 @@ class File extends BaseFile {
 
 		$content = $this->getContents(); //store content before change fullname
 
-		$this
-			->set('id', $id)
-			->setGuid($guid);
+		$this->set('id', $id);
+
+		if ($isNew)
+			$this->setGuid($guid);
 
 		Util::checkPath($guid);
 
