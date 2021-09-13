@@ -139,7 +139,7 @@ class File extends BaseFile {
 		if ($this->exists())
 			$this->unlink();
 
-		if ($this->parts) {
+		if ($this->getParts()) {
 			foreach ($this->parts as $part) {
 				if ($part->exists())
 					$part->unlink();
