@@ -14,6 +14,10 @@ class File extends BaseFile {
 
 	protected $parts = null;
 
+	public static function setTableParts($table) {
+		self::$tableParts = $table;
+	}
+
 	private function setGuid($guid) {
 		return $this
 			->set('guid', $guid)
