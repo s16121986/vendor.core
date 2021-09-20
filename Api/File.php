@@ -111,8 +111,8 @@ class File extends BaseFile {
 
 		$this->set('id', $id);
 
-		if ($isNew)
-			$this->setGuid($guid);
+		//if ($isNew)
+		$this->setGuid($guid);
 
 		Util::checkPath($guid);
 
