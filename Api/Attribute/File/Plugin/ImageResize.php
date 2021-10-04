@@ -39,7 +39,8 @@ class ImageResize extends FilePlugin{
 			'image/jpeg' => 'JPG',
 			'image/jpg' => 'JPG',
 			'image/png' => 'PNG',
-			'image/gif' => 'GIF'
+			'image/gif' => 'GIF',
+			'image/x-ms-bmp' => 'XBMP'
 		];
 		if (!isset($formats[$file->mime_type]))
 			return;
