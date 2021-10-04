@@ -133,7 +133,10 @@ abstract class Util {
 	}
 
 	public static function fwrite($file, $content = null) {
-		$filename = self::getDestination($file->guid);
+		$filename = $file->getDestination();
+
+		if (!$filename)
+			throw new Exception('Cant write empty filename');
 
 		if (false === ($fh = fopen($filename, 'w')))
 			throw new Exception('Cant create file');

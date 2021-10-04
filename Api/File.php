@@ -56,6 +56,10 @@ class File extends BaseFile {
 		return parent::setDestination($destination);
 	}
 
+	public function getDestination() {
+		return $this->guid ? Util::getDestination($this->guid) : null;
+	}
+
 	public function setParent($id, $type = null) {
 		return $this
 			->set('parent_id', $id)
