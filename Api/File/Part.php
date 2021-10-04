@@ -28,6 +28,7 @@ class Part extends File {
 			case 'path':
 			case 'mime_type':
 			case 'type':
+			case 'guid':
 				return $this->file->$name;
 		}
 		return parent::__get($name);
