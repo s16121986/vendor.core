@@ -19,7 +19,7 @@ class Part extends File {
 	public function __get($name) {
 		switch ($name) {
 			case 'fullname':
-				return $this->file->path . $this->file->guid . self::INDEX_PREFIX . $this->index;
+				return $this->getDestination();
 			case 'basename':
 				return $this->file->basename . self::INDEX_PREFIX . $this->index;
 			case 'name':
@@ -32,6 +32,11 @@ class Part extends File {
 				return $this->file->$name;
 		}
 		return parent::__get($name);
+	}
+
+	public function getDestination() {
+		$filename = $this->file->getDestination();
+		return $filename ? $filename . self::INDEX_PREFIX . $this->index : null;
 	}
 
 	public function __toString() {
