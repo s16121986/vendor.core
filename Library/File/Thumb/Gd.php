@@ -94,6 +94,9 @@ class Gd extends AbstractThumb {
 			case 'STRING':
 				$this->oldImage = imagecreatefromstring($this->fileName);
 				break;
+			case 'XBMP':
+				$this->oldImage = imagecreatefromxbm($this->fileName);
+				break;
 		}
 
 		$this->currentDimensions = array
