@@ -17,7 +17,7 @@ class AttributeNumber extends AbstractAttribute{
 		
 		if (is_string($value)) {
 			$value = str_replace(' ', '', $value);
-			$value = str_replace(',', '.', $value);
+			$value = (float)str_replace(',', '.', $value);
 		}
 		$isNegative = (0 > $value);
 		if ($isNegative) {
