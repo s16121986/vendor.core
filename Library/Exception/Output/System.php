@@ -42,9 +42,9 @@ class System extends \Exception\Output {
 	 */
 	public function __construct($fileLinkFormat = null) {
 		if (is_null($fileLinkFormat)) {
-			$this->_fileLinkFormat = self::$fileLinkFormat;
+			$this->_fileLinkFormat = (string)self::$fileLinkFormat;
 		} else {
-			$this->_fileLinkFormat = $fileLinkFormat;
+			$this->_fileLinkFormat = (string)$fileLinkFormat;
 		}
 	}
 
@@ -57,7 +57,7 @@ class System extends \Exception\Output {
 		if (is_null($file) || !strlen($this->_fileLinkFormat)) {
 			return parent::getFileLink($file, $line);
 		}
-		$fileLink = str_replace(array('%f', '%l'), array(urlencode($file), $line), $this->_fileLinkFormat);
+		$fileLink = str_replace(['%f', '%l'], [urlencode($file), $line], $this->_fileLinkFormat);
 		return '    <a href="' . $fileLink . '">' . self::formatString(parent::getFileLink($file, $line)) . '</a>';
 	}
 
